@@ -29,6 +29,18 @@
   --text: #111114; --text2: #4a4a5a; --text3: #6e6e7d;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
+/* Smooth theme transitions — only when toggling */
+.theme-transition *, .theme-transition *::before, .theme-transition *::after {
+  transition: background-color 0.32s ease, border-color 0.28s ease, color 0.28s ease !important;
+}
+.toggle { transition: background 0.3s; }
+.toggle::after { transition: left 0.3s; }
+.bar-item { transition: color 0.3s, opacity 0.3s; }
+.bar-item .bi { transition: color 0.3s, filter 0.3s, transform 0.3s; }
+.film-card-h { transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s; }
+.genre-pill { transition: background 0.25s, border-color 0.25s, color 0.25s; }
+.icon-btn { transition: all 0.3s ease; }
+.lib-card-inner { transition: transform 0.28s cubic-bezier(0.2,0.8,0.2,1); }
 html{scroll-behavior:smooth;}
 body{
   font-family:'DM Sans',sans-serif; color:var(--text);
@@ -74,6 +86,42 @@ body::after {
 }
 [data-theme="light"] body::before { background: linear-gradient(to right, var(--bg) 0%, transparent 100%); }
 [data-theme="light"] body::after  { background: linear-gradient(to left, var(--bg) 0%, transparent 100%); }
+
+/* ============================================================ */
+/* SKELETON LOADING                                              */
+/* ============================================================ */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--bg3) 25%, var(--bg4) 50%, var(--bg3) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 8px;
+}
+.skeleton-card {
+  flex-shrink: 0; width: 150px;
+}
+.skeleton-poster {
+  width: 150px; aspect-ratio: 2/3; border-radius: 16px;
+}
+.skeleton-text {
+  height: 12px; margin-top: 10px; width: 80%;
+}
+.skeleton-text-sm {
+  height: 10px; margin-top: 6px; width: 55%;
+}
+.skeleton-lib-card {
+  background: var(--card); border-radius: 16px; border: 1px solid var(--border);
+  overflow: hidden;
+}
+.skeleton-lib-poster {
+  width: 100%; aspect-ratio: 2/3;
+}
+.skeleton-lib-info {
+  padding: 8px;
+}
 ::-webkit-scrollbar{width:3px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--red);border-radius:4px;}
@@ -113,6 +161,25 @@ body.modal-open { overflow: hidden !important; touch-action: none; }
 .page.active{display:block;}
 @keyframes fadeIn { from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
 @keyframes spin { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+/* ============================================================ */
+/* UNDO TOAST                                                    */
+/* ============================================================ */
+#undoToast {
+  position: fixed; bottom: calc(var(--bar-h) + 16px); left: 50%; transform: translateX(-50%) translateY(20px);
+  background: rgba(20,20,30,0.92); border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 16px; padding: 12px 16px; display: flex; align-items: center; gap: 12px;
+  backdrop-filter: blur(30px) saturate(160%); -webkit-backdrop-filter: blur(30px) saturate(160%);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4); z-index: 9000; white-space: nowrap;
+  opacity: 0; pointer-events: none; transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.2,0.8,0.2,1);
+  max-width: calc(100vw - 40px);
+}
+[data-theme="light"] #undoToast { background: rgba(255,255,255,0.92); border-color: rgba(0,0,0,0.12); }
+#undoToast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+#undoToast .undo-msg { font-size: 0.85rem; color: var(--text); font-weight: 500; flex: 1; }
+#undoToast .undo-bar-wrap { width: 40px; height: 3px; background: rgba(255,255,255,0.15); border-radius: 2px; overflow: hidden; }
+#undoToast .undo-bar { height: 100%; background: var(--red); width: 100%; transform-origin: left; animation: none; border-radius: 2px; }
+#undoToast .undo-btn { font-size: 0.85rem; font-weight: 800; color: var(--red); cursor: pointer; padding: 4px 8px; border-radius: 8px; background: rgba(216,0,12,0.1); border: 1px solid rgba(216,0,12,0.25); letter-spacing: 0.02em; flex-shrink: 0; }
+@keyframes undoBarShrink { from { transform: scaleX(1); } to { transform: scaleX(0); } }
 .tmdb-search-bar{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:20px;transition:border-color .2s,box-shadow .2s}
 .tmdb-search-bar:focus-within{border-color:var(--red);box-shadow:0 0 0 4px rgba(216,0,12,.12)}
 .tmdb-search-bar input{flex:1;background:transparent;border:none;color:var(--text);font-size:1rem;outline:none;font-family:'DM Sans',sans-serif}
@@ -279,32 +346,68 @@ body.modal-open { overflow: hidden !important; touch-action: none; }
 .library-grid{ display:grid;grid-template-columns:repeat(2,1fr); gap:16px;padding:0 20px; }
 @media(min-width:600px){.library-grid{grid-template-columns:repeat(3,1fr);}}
 @media(min-width:900px){.library-grid{grid-template-columns:repeat(4,1fr);}}
+
+/* ============================================================ */
+/* SWIPE GESTURE ON LIB CARDS                                   */
+/* ============================================================ */
+.lib-card-swipe-wrap {
+  position: relative; overflow: hidden; border-radius: 16px;
+  border: 1px solid var(--border);
+}
+.lib-card-swipe-actions {
+  position: absolute; top: 0; right: 0; bottom: 0;
+  display: flex; align-items: stretch;
+  pointer-events: none; opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.lib-card-swipe-wrap.swiped .lib-card-swipe-actions {
+  pointer-events: auto; opacity: 1;
+}
+.lib-swipe-btn {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; padding: 0 14px; font-size: 0.55rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer;
+  border: none; outline: none;
+}
+.lib-swipe-btn-del { background: var(--red); color: #fff; border-radius: 0 14px 14px 0; }
+.lib-swipe-btn-edit { background: rgba(59,130,246,0.85); color: #fff; border-radius: 14px 0 0 14px; }
+.lib-swipe-btn i { font-size: 1rem; }
+.lib-card-inner {
+  position: relative; z-index: 1;
+  transform: translateX(0);
+  transition: transform 0.28s cubic-bezier(0.2,0.8,0.2,1);
+  background: var(--card2);
+  border-radius: 15px;
+}
+.lib-card-swipe-wrap.swiped .lib-card-inner {
+  transform: translateX(-120px);
+}
 .lib-card{ border-radius:16px;overflow:hidden;cursor:pointer; transition:all 0.3s; position:relative; background:#0a0a0e; border:1px solid var(--border); display:flex; flex-direction:column;
   -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
 .lib-card img { -webkit-touch-callout:none; pointer-events:none; user-select:none; }
 .lib-card:hover{border-color:var(--text3);transform:translateY(-4px); box-shadow:0 12px 25px rgba(0,0,0,0.3);}
-.lib-poster{width:100%;aspect-ratio:2/3;background:rgba(0,0,0,0.2);position:relative;overflow:hidden;flex:1 1 auto;}
+.lib-poster{width:100%;aspect-ratio:2/3;background:rgba(0,0,0,0.2);position:relative;overflow:hidden;flex:0 0 auto;}
 .lib-poster img{width:100%;height:100%;object-fit:cover;display:block;}
 .lib-poster::after {
   content:'';
   position:absolute;
   bottom:0; left:0; right:0;
-  height:22%;
+  height:28%;
   background: linear-gradient(
     to bottom,
     transparent 0%,
-    rgba(10,10,14,0.9) 80%,
-    rgba(10,10,14,1) 100%
+    rgba(10,10,14,0.85) 70%,
+    #0a0a0e 100%
   );
   pointer-events:none;
-  z-index:1;
+  z-index:3;
 }
 [data-theme="light"] .lib-poster::after {
   background: linear-gradient(
     to bottom,
     transparent 0%,
-    rgba(232,232,238,0.9) 80%,
-    rgba(232,232,238,1) 100%
+    rgba(232,232,238,0.85) 70%,
+    #e8e8ee 100%
   );
 }
 .lib-info{
@@ -312,9 +415,16 @@ body.modal-open { overflow: hidden !important; touch-action: none; }
   background: #0a0a0e;
   position:relative;
   z-index:2;
+  height:72px;
+  flex:0 0 72px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  overflow:hidden;
+  margin-top:-1px;
 }
 [data-theme="light"] .lib-info { background: #e8e8ee; }
-.lib-title{font-size:0.82rem;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:5px; display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.lib-title{font-size:0.82rem;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:0; display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 .lib-meta{display:flex;align-items:center;justify-content:space-between;}
 .lib-rating{font-size:0.72rem;color:var(--gold);font-weight:600;}
 .lib-genre{font-size:0.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.04em;}
@@ -610,6 +720,10 @@ body.modal-open { overflow: hidden !important; touch-action: none; }
 .custom-sel-opt:active { background: rgba(216,0,12,0.08); }
 .custom-sel-opt.selected { color: var(--text); font-weight: 700; background: rgba(216,0,12,0.06); }
 .custom-sel-opt.selected::after { content: '\F272'; font-family: 'bootstrap-icons'; color: var(--red); font-size: 1rem; }
+.compact-sel-wrap { flex-shrink: 0; width: 76px; }
+.compact-sel-btn { width: 76px; padding: 8px 10px; font-size: 0.8rem; border-radius: 10px; gap: 4px; }
+.compact-sel-btn span { flex: none; }
+.compact-sel-btn .sel-arrow { font-size: 0.75rem; }
 
 /* ======================================================== */
 /* CSS WRAPPED: SKEMA VERTIKAL 9:16  */
@@ -887,6 +1001,7 @@ img.w-avatar, .w-avatar {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <nav class="top-nav">
   <div class="brand-logo" onclick="navTo('home')">
     <div class="brand-e">E</div>
@@ -1021,15 +1136,67 @@ img.w-avatar, .w-avatar {
       <i class="bi bi-chevron-right settings-arrow"></i>
     </div>
     <div class="settings-section-label">Data Storage</div>
+    <div class="settings-item glass-card" style="margin:0 20px 0; border-radius:16px 16px 0 0; border-bottom:1px solid var(--border);">
+      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-hdd"></i></div><div><div class="settings-label">Ukuran Data</div><div class="settings-desc" id="backupSizeDesc">Menghitung...</div></div></div>
+    </div>
+    <div class="settings-item glass-card" style="margin:0 20px 12px; border-radius:0 0 16px 16px; border-bottom:1px solid var(--border);">
+      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-calendar-check"></i></div><div><div class="settings-label" id="lastBackupDesc">Belum pernah backup</div><div class="settings-desc">Status backup terakhir</div></div></div>
+    </div>
     <div class="settings-item glass-card" style="margin:0 20px 12px; border-radius:16px; border-bottom:1px solid var(--border);" onclick="backupData()">
-      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-cloud-download"></i></div><div><div class="settings-label">Backup Data</div><div class="settings-desc">Simpan koleksi ke file .json</div></div></div>
+      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-cloud-download"></i></div><div><div class="settings-label">Backup Data</div><div class="settings-desc">Pilih format: JSON, CSV, atau Excel</div></div></div>
       <i class="bi bi-chevron-right settings-arrow"></i>
     </div>
     <div class="settings-item glass-card" style="margin:0 20px 12px; border-radius:16px; border-bottom:1px solid var(--border);" onclick="document.getElementById('restoreInput').click()">
-      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-cloud-upload"></i></div><div><div class="settings-label">Restore Data</div><div class="settings-desc">Pulihkan koleksi dari file backup</div></div></div>
+      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-cloud-upload"></i></div><div><div class="settings-label">Restore Data</div><div class="settings-desc">Pulihkan koleksi dari file backup .json</div></div></div>
       <i class="bi bi-chevron-right settings-arrow"></i>
     </div>
     <input type="file" id="restoreInput" accept=".json" style="display:none" onchange="restoreData(this)">
+    <div class="settings-item glass-card" style="margin:0 20px 12px; border-radius:16px; border-bottom:1px solid var(--border);">
+      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-bell-fill"></i></div><div><div class="settings-label">Pengingat Backup</div><div class="settings-desc">Pengingat backup otomatis</div></div></div>
+      <select id="autoBackupDaysSelect" style="display:none;" onchange="setAutoBackupDays(this.value)">
+        <option value="0">Mati</option>
+        <option value="3">3H</option>
+        <option value="7">7H</option>
+        <option value="14">14H</option>
+        <option value="30">30H</option>
+      </select>
+      <div class="custom-sel-wrap compact-sel-wrap" onclick="event.stopPropagation()">
+        <div class="custom-sel-btn compact-sel-btn" id="autoBackupDaysSelectBtn" onclick="openCustomSel('autoBackupDaysSelect', this)">
+          <span id="autoBackupDaysSelectLbl">Mati</span>
+          <i class="bi bi-chevron-down sel-arrow"></i>
+        </div>
+        <div class="custom-sel-popup" id="autoBackupDaysSelectPop">
+          <div class="custom-sel-opt selected" data-val="0" onclick="pickCustomSel('autoBackupDaysSelect',this)">Mati</div>
+          <div class="custom-sel-opt" data-val="3" onclick="pickCustomSel('autoBackupDaysSelect',this)">3H</div>
+          <div class="custom-sel-opt" data-val="7" onclick="pickCustomSel('autoBackupDaysSelect',this)">7H</div>
+          <div class="custom-sel-opt" data-val="14" onclick="pickCustomSel('autoBackupDaysSelect',this)">14H</div>
+          <div class="custom-sel-opt" data-val="30" onclick="pickCustomSel('autoBackupDaysSelect',this)">30H</div>
+        </div>
+      </div>
+    </div>
+    <div class="settings-item glass-card" style="margin:0 20px 12px; border-radius:16px; border-bottom:1px solid var(--border);">
+      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-trash3-fill"></i></div><div><div class="settings-label">Histori Maksimal</div><div class="settings-desc">History lama dihapus otomatis</div></div></div>
+      <select id="historyMaxMonthsSelect" style="display:none;" onchange="setHistoryMaxMonths(this.value)">
+        <option value="0">Tdk</option>
+        <option value="1">1B</option>
+        <option value="3">3B</option>
+        <option value="6">6B</option>
+        <option value="12">12B</option>
+      </select>
+      <div class="custom-sel-wrap compact-sel-wrap" onclick="event.stopPropagation()">
+        <div class="custom-sel-btn compact-sel-btn" id="historyMaxMonthsSelectBtn" onclick="openCustomSel('historyMaxMonthsSelect', this)">
+          <span id="historyMaxMonthsSelectLbl">Tdk</span>
+          <i class="bi bi-chevron-down sel-arrow"></i>
+        </div>
+        <div class="custom-sel-popup" id="historyMaxMonthsSelectPop">
+          <div class="custom-sel-opt selected" data-val="0" onclick="pickCustomSel('historyMaxMonthsSelect',this)">Tdk</div>
+          <div class="custom-sel-opt" data-val="1" onclick="pickCustomSel('historyMaxMonthsSelect',this)">1B</div>
+          <div class="custom-sel-opt" data-val="3" onclick="pickCustomSel('historyMaxMonthsSelect',this)">3B</div>
+          <div class="custom-sel-opt" data-val="6" onclick="pickCustomSel('historyMaxMonthsSelect',this)">6B</div>
+          <div class="custom-sel-opt" data-val="12" onclick="pickCustomSel('historyMaxMonthsSelect',this)">12B</div>
+        </div>
+      </div>
+    </div>
     <div class="settings-section-label">Informasi</div>
     <div class="settings-item glass-card" style="margin:0 20px 12px; border-radius:16px; border-bottom:1px solid var(--border);" onclick="navTo('history')">
       <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-clock-history"></i></div><div><div class="settings-label">Riwayat Aktivitas</div><div class="settings-desc">Lihat semua histori perubahan</div></div></div>
@@ -1052,6 +1219,11 @@ img.w-avatar, .w-avatar {
 </nav>
 <button class="fab" id="mainFab" onclick="openAddFilm()"><i class="bi bi-plus-lg"></i> Tambah Movie/Series</button>
 <div class="toast" id="toast"></div>
+<div id="undoToast">
+  <div class="undo-msg" id="undoToastMsg">Dihapus</div>
+  <div class="undo-bar-wrap"><div class="undo-bar" id="undoToastBar"></div></div>
+  <div class="undo-btn" onclick="execUndoToast()">Batalkan</div>
+</div>
 <div class="modal-overlay" id="filterModal">
   <div class="modal-sheet swipe-sheet" style="padding-bottom: 30px;">
     <div class="modal-handle"></div>
@@ -1177,13 +1349,21 @@ img.w-avatar, .w-avatar {
     <div class="modal-handle"></div>
     <div class="modal-close-btn" onclick="closeModal('tmdbKeyModal',event)"><i class="bi bi-x-lg"></i></div>
     <div class="modal-title">TMDb API Key</div>
+    <!-- Developer Badge -->
+    <div style="display:flex;align-items:center;gap:8px;background:rgba(216,0,12,0.07);border:1px solid rgba(216,0,12,0.25);border-radius:10px;padding:9px 13px;margin-bottom:14px;">
+      <i class="bi bi-shield-lock-fill" style="color:var(--red);font-size:1rem;flex-shrink:0;"></i>
+      <div>
+        <div style="font-size:0.72rem;font-weight:800;color:var(--red);text-transform:uppercase;letter-spacing:0.06em;">PIN Developer — Kustomisasi API Key</div>
+        <div style="font-size:0.67rem;color:var(--text3);margin-top:2px;">Akses ini dilindungi PIN Developer. API key bawaan tetap menjadi hak developer.</div>
+      </div>
+    </div>
     <div style="font-size:.84rem;color:var(--text2);line-height:1.65;margin-bottom:20px;">Daftar gratis di <a href="https://www.themoviedb.org/signup" target="_blank" style="color:rgba(1,180,228,.9);text-decoration:none;font-weight:600;">themoviedb.org</a>, lalu buka <b style="color:var(--text);">Profil &rarr; Pengaturan &rarr; API</b> untuk mendapatkan API Key v3.</div>
     <div class="form-group">
       <label class="form-label">API Key (v3 auth)</label>
       <input class="form-input" id="tmdbKeyModalInput" placeholder="Paste API key 32 karakter..." type="text" style="font-family:monospace;letter-spacing:.04em;">
     </div>
     <button class="btn-primary" onclick="saveTmdbKeyModal()" style="margin-bottom:10px;"><i class="bi bi-check-lg"></i> Simpan API Key</button>
-    <button class="btn-secondary" onclick="deleteTmdbKey()" style="color:var(--red);border-color:rgba(216,0,12,.35);margin-top:0;"><i class="bi bi-trash"></i> Hapus API Key</button>
+    <button class="btn-secondary" onclick="deleteTmdbKey()" style="color:var(--red);border-color:rgba(216,0,12,.35);margin-top:0;"><i class="bi bi-trash"></i> Hapus API Key (Reset ke Bawaan)</button>
   </div>
 </div>
 <div class="modal-overlay" id="tmdbSearchModal">
@@ -1243,7 +1423,10 @@ img.w-avatar, .w-avatar {
         <div style="flex:1;min-width:0;">
           <div id="tmdbQTitle" style="font-size:.95rem;font-weight:800;color:var(--text);margin-bottom:4px;line-height:1.25;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;"></div>
           <div id="tmdbQMeta" style="font-size:.7rem;color:var(--text2);margin-bottom:8px;line-height:1.5;"></div>
-          <div id="tmdbQGenres" style="display:flex;flex-wrap:wrap;gap:4px;"></div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-bottom:6px;">
+            <div id="tmdbQGenres" style="display:contents;"></div>
+            <span id="tmdbQAgeBadge" style="display:none;padding:2px 7px;border-radius:6px;background:rgba(216,0,12,0.12);border:1px solid rgba(216,0,12,0.3);font-size:.6rem;font-weight:800;color:var(--red);letter-spacing:.04em;align-items:center;"></span>
+          </div>
         </div>
       </div>
       <div id="tmdbQEpsGroup" style="display:none;margin-bottom:20px;">
@@ -1750,7 +1933,7 @@ img.w-avatar, .w-avatar {
       <button class="pin-key" onclick="pinKey('9')">9</button>
       <div></div>
       <button class="pin-key" onclick="pinKey('0')">0</button>
-      <button class="pin-key pin-del" onclick="pinDel()"><i class="bi bi-delete"></i></button>
+      <button class="pin-key pin-del" onclick="pinDel()" title="Hapus angka terakhir"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><line x1="18" y1="9" x2="13" y2="14"/><line x1="13" y1="9" x2="18" y2="14"/></svg></button>
     </div>
     <div id="pinError" style="margin-top:14px; font-size:0.78rem; color:var(--red); min-height:18px; font-weight:600;"></div>
   </div>
@@ -1802,6 +1985,26 @@ img.w-avatar, .w-avatar {
     <button class="btn-primary" onclick="saveProfile()">Simpan</button>
   </div>
 </div>
+<div class="modal-overlay" id="backupFormatModal">
+  <div class="modal-sheet swipe-sheet">
+    <div class="modal-handle"></div><div class="modal-close-btn" onclick="closeModal('backupFormatModal', event)"><i class="bi bi-x-lg"></i></div>
+    <div class="modal-title">Pilih Format Backup</div>
+    <div style="font-size:0.8rem;color:var(--text2);margin:-8px 0 18px;line-height:1.5;">Pilih format file untuk menyimpan koleksimu.</div>
+    <div class="settings-item glass-card" style="margin:0 0 12px; border-radius:16px;" onclick="downloadBackupJSON()">
+      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-filetype-json"></i></div><div><div class="settings-label">File JSON</div><div class="settings-desc">Lengkap & bisa di-restore kembali ke app</div></div></div>
+      <i class="bi bi-chevron-right settings-arrow"></i>
+    </div>
+    <div class="settings-item glass-card" style="margin:0 0 12px; border-radius:16px;" onclick="downloadBackupExcel()">
+      <div class="settings-item-left"><div class="settings-icon" style="background:rgba(33,150,83,.1);border-color:rgba(33,150,83,.25);"><i class="bi bi-file-earmark-excel" style="color:#21a366;"></i></div><div><div class="settings-label">File Excel (.xlsx)</div><div class="settings-desc">Tabel rapi: 1 film = 1 baris, siap dibuka di Excel/Sheets</div></div></div>
+      <i class="bi bi-chevron-right settings-arrow"></i>
+    </div>
+    <div class="settings-item glass-card" style="margin:0; border-radius:16px; border-bottom:none;" onclick="downloadBackupCSV()">
+      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-filetype-csv"></i></div><div><div class="settings-label">File CSV</div><div class="settings-desc">Format ringan, juga bisa dibuka di Excel/Sheets</div></div></div>
+      <i class="bi bi-chevron-right settings-arrow"></i>
+    </div>
+    <div style="font-size:0.7rem;color:var(--text3);margin-top:16px;line-height:1.5;"><i class="bi bi-info-circle"></i> Catatan: format Excel & CSV hanya untuk dilihat/dibagikan (tidak bisa di-restore ke app). Untuk cadangan yang bisa dipulihkan, gunakan format JSON.</div>
+  </div>
+</div>
 <div class="modal-overlay" id="wrappedModal">
   <div class="modal-sheet swipe-sheet" style="padding: 24px;">
     <div class="modal-handle"></div>
@@ -1834,8 +2037,8 @@ img.w-avatar, .w-avatar {
   </div>
 </div>
 <script>
-let DB = { profile: { name: 'Nama Kamu', avatar: '' }, films: [], progress: [], watchlist: [], history: [], theme: 'dark' };
-let editingFilmId = null; let homeGenreFilter = 'all'; let libGenreFilter = 'all'; let libSearch = ''; let libSortBy = 'rating_desc'; let libMoodFilter = 'all'; let libCountryFilter = 'all'; let libAgeFilter = 'all';
+let DB = { profile: { name: 'Nama Kamu', avatar: '' }, films: [], progress: [], watchlist: [], history: [], theme: 'dark', settings: { autoBackupDays: 0, lastBackupAt: 0, historyMaxMonths: 0 } };
+let editingFilmId = null; let homeGenreFilter = 'all'; let libGenreFilter = 'all'; let libSearch = ''; let libSortBy = 'rating_desc'; let libMoodFilter = 'all'; let libCountryFilter = 'all'; let libAgeFilter = 'all'; let homeCountersAnimated = false;
 let bulkMode = false; let bulkSelected = new Set();
 let detailFilmId = null; let updateProgId = null; let transferWlId = null; let transferProgId = null; let currentHistoryViewId = null;
 let cropperInstance = null; let currentPage = 'home'; let currentWrappedTheme = 'dark';
@@ -2304,9 +2507,33 @@ function navTo(page) {
   const barItem = document.querySelector(`.bar-item[data-page="${page}"]`);
   if(barItem) barItem.classList.add('active');
   checkFabVisibility(); window.scrollTo(0, 0);
-  try { if(page==='home') renderHome(); if(page==='library') renderLibrary(); if(page==='progress') renderProgress(); if(page==='watchlist') renderWatchlist(); if(page==='history') renderHistory(); if(page==='stats') renderStats(); } catch(e) { console.error(e); }
+  if (page === 'home') homeCountersAnimated = false;
+  try { if(page==='home') renderHome(); if(page==='library') renderLibrary(); if(page==='progress') renderProgress(); if(page==='watchlist') renderWatchlist(); if(page==='history') renderHistory(); if(page==='stats') renderStats(); if(page==='settings') renderSettingsDataInfo(); } catch(e) { console.error(e); }
 }
-function toggleTheme() { DB.theme = DB.theme === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', DB.theme); const tg = document.getElementById('themeToggle'); if(tg) tg.className = 'toggle ' + (DB.theme === 'dark' ? 'on' : ''); save(); }
+function toggleTheme() {
+  const oldTheme = DB.theme;
+  const newTheme = oldTheme === 'dark' ? 'light' : 'dark';
+  const oldBg      = oldTheme === 'light' ? '#f4f4f7'             : '#030305';
+  const oldBgAlpha = oldTheme === 'light' ? 'rgba(244,244,247,0)' : 'rgba(3,3,5,0)';
+  const curtain = document.createElement('div');
+  curtain.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(to bottom,' + oldBgAlpha + ' 0%,' + oldBg + ' 20%,' + oldBg + ' 100%);z-index:99999;pointer-events:none;transform:translateY(0);will-change:transform;overflow:hidden;';
+  const blurEdge = document.createElement('div');
+  blurEdge.style.cssText = 'position:absolute;left:0;right:0;top:0;height:80px;backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);';
+  curtain.appendChild(blurEdge);
+  document.body.appendChild(curtain);
+  DB.theme = newTheme;
+  document.documentElement.setAttribute('data-theme', DB.theme);
+  const tg = document.getElementById('themeToggle');
+  if(tg) tg.className = 'toggle ' + (DB.theme === 'dark' ? 'on' : '');
+  save();
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      curtain.style.transition = 'transform 0.54s cubic-bezier(0.4,0,0.2,1)';
+      curtain.style.transform = 'translateY(100%)';
+      setTimeout(() => curtain.remove(), 570);
+    });
+  });
+}
 // Smooth Hardware-Accelerated Modal Function
 function openModal(id) {
     const overlay = document.getElementById(id);
@@ -2472,16 +2699,24 @@ function renderHome() {
       document.getElementById('levelBarFill').style.width = `${(lvData.progress / lvData.toNext) * 100}%`;
       const rawMins = calculateTotalMinsRaw();
       const wtEl = document.getElementById('statWatchTime');
-      animateCounter(wtEl, 0, rawMins, 1200, v => { const h = Math.floor(v/60); const m = Math.floor(v%60); return `${h}j ${m}m`; });
       const avg = total ? (DB.films.reduce((s,f)=>s+(f.rating||0),0)/total).toFixed(1) : '—'; 
       const thisMonth = new Date().getMonth(); const monthCount = Array.isArray(DB.films) ? DB.films.filter(f => f && f.addedAt && new Date(f.addedAt).getMonth() === thisMonth).length : 0;
-      // Animated counters - slower so it's visible
-      animateCounter(document.getElementById('statMonth'), 0, monthCount, 900);
-      if (avg !== '—') {
-        const avgEl = document.getElementById('statAvg');
-        const avgTarget = parseFloat(avg);
-        animateCounter(avgEl, 0, avgTarget * 10, 1000, v => (v/10).toFixed(1));
-      } else { document.getElementById('statAvg').textContent = '—'; }
+      if (!homeCountersAnimated) {
+        homeCountersAnimated = true;
+        animateCounter(wtEl, 0, rawMins, 1200, v => { const h = Math.floor(v/60); const m = Math.floor(v%60); return `${h}j ${m}m`; });
+        animateCounter(document.getElementById('statMonth'), 0, monthCount, 900);
+        if (avg !== '—') {
+          const avgEl = document.getElementById('statAvg');
+          const avgTarget = parseFloat(avg);
+          animateCounter(avgEl, 0, avgTarget * 10, 1000, v => (v/10).toFixed(1));
+        } else { document.getElementById('statAvg').textContent = '—'; }
+      } else {
+        const h = Math.floor(rawMins/60); const m = Math.floor(rawMins%60);
+        wtEl.textContent = `${h}j ${m}m`;
+        document.getElementById('statMonth').textContent = monthCount;
+        if (avg !== '—') { document.getElementById('statAvg').textContent = parseFloat(avg).toFixed(1); }
+        else { document.getElementById('statAvg').textContent = '—'; }
+      }
       let films = Array.isArray(DB.films) ? DB.films.slice().sort((a,b) => (b.rating||0) - (a.rating||0) || (b.addedAt||0) - (a.addedAt||0)) : [];
       let top10Titles = films.slice(0, 10).map(f => f.title);
       const genreCount = {}; if(Array.isArray(DB.films)) DB.films.forEach(f => (f.genres||[]).forEach(g => genreCount[g] = (genreCount[g]||0)+1));
@@ -2490,7 +2725,7 @@ function renderHome() {
       document.getElementById('personaText').textContent = getPersonaDynamic(topGenresListForDynamicLogic, top10Titles);
       document.getElementById('cinemaQuote').textContent = getCinemaQuoteDynamic(topGenresListForDynamicLogic, top10Titles);
       if (homeGenreFilter !== 'all') films = films.filter(f => (f.genres||[]).includes(homeGenreFilter));
-      const row = document.getElementById('topFilmsRow'); row.innerHTML = films.slice(0, 10).length ? films.slice(0, 10).map((f,i) => filmCardH(f, i+1)).join('') : `<div class="empty-state"><i class="bi bi-film empty-icon"></i><div class="empty-text">Belum ada film di sini.</div></div>`;
+      const row = document.getElementById('topFilmsRow'); row.innerHTML = films.slice(0, 10).length ? films.slice(0, 10).map((f,i) => filmCardH(f, i+1)).join('') : `<div class="empty-state"><i class="bi bi-film empty-icon" style="font-size:3rem;"></i><div class="empty-text" style="margin-bottom:6px;">Belum ada film di sini.</div><div onclick="openAddFilm()" style="margin-top:12px;padding:12px 28px;border-radius:14px;background:var(--red);color:#fff;font-size:0.88rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 14px var(--red-glow);"> Tambah Film Pertamamu</div></div>`;
       const recent = Array.isArray(DB.films) ? DB.films.slice().sort((a,b) => (b.addedAt||0) - (a.addedAt||0)).slice(0,6) : []; document.getElementById('recentFilmsRow').innerHTML = recent.length ? recent.map(f => filmCardH(f, null)).join('') : '<div class="empty-state"><div class="empty-text">Belum ada film baru.</div></div>';
       renderGenrePills();
   } catch(e) { console.error("Error Home Render:", e); }
@@ -2716,6 +2951,20 @@ function getCountryTextColor(country) {
   if (first === '#FFFFFF' || first === '#FEDF00' || first === '#FFCE00' || first === '#FECC02' || first === '#FF9933') return '#111';
   return '#fff';
 }
+function resetLibraryFilter() {
+  libGenreFilter = 'all'; libMoodFilter = 'all'; libCountryFilter = 'all'; libAgeFilter = 'all'; libSearch = '';
+  var searchEl = document.getElementById('libSearchInput');
+  if (searchEl) searchEl.value = '';
+  renderLibrary();
+}
+function showLibrarySkeleton() {
+  var grid = document.getElementById('libraryGrid');
+  if (!grid) return;
+  var count = 6;
+  grid.innerHTML = Array.from({length: count}).map(function() {
+    return '<div class="skeleton-lib-card"><div class="skeleton skeleton-lib-poster"></div><div class="skeleton-lib-info"><div class="skeleton" style="height:12px;border-radius:6px;margin-bottom:6px;width:75%;"></div><div class="skeleton" style="height:10px;border-radius:6px;width:50%;"></div></div></div>';
+  }).join('');
+}
 function renderLibrary() {
   try {
       let films = Array.isArray(DB.films) ? DB.films.slice() : [];
@@ -2760,7 +3009,16 @@ function renderLibrary() {
       else if (libSortBy === 'duration_asc') films.sort((a,b) => (a.duration||0) - (b.duration||0));
       
       document.getElementById('libCount').textContent = `${films.length} Movies & Series tercatat`; const grid = document.getElementById('libraryGrid');
-      if (films.length === 0) { grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="bi bi-collection empty-icon"></i><div class="empty-text">Lemari masih kosong.</div></div>'; return; }
+      if (films.length === 0) {
+        const isFiltered = libGenreFilter !== 'all' || libMoodFilter !== 'all' || libCountryFilter !== 'all' || libAgeFilter !== 'all' || libSearch;
+        if (isFiltered) {
+          grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="bi bi-funnel empty-icon"></i><div class="empty-text">Tidak ada film yang cocok dengan filter.</div><div onclick="resetLibraryFilter()" style="margin-top:14px;padding:10px 22px;border-radius:12px;background:var(--red);color:#fff;font-size:0.82rem;font-weight:700;cursor:pointer;display:inline-block;">Reset Filter</div></div>';
+        } else {
+          grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="bi bi-film empty-icon" style="font-size:3rem;margin-bottom:12px;"></i><div class="empty-text" style="margin-bottom:6px;">Lemari masih kosong.</div><div style="font-size:0.78rem;color:var(--text3);margin-bottom:16px;">Mulai catat tontonan pertamamu!</div><div onclick="openAddFilm()" style="padding:12px 28px;border-radius:14px;background:var(--red);color:#fff;font-size:0.88rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 14px var(--red-glow);"> Tambah Film Pertamamu</div></div>';
+        }
+        return;
+
+      }
       grid.innerHTML = films.map(f => {
         const ageBadgeLib = f.ageRating ? `<div class="poster-age-badge">${f.ageRating}</div>` : '';
         const rewatchBadge = f.rewatch > 0 ? `<div style="position:absolute;bottom:10px;left:10px;background:rgba(245,158,11,0.85);color:#fff;border-radius:6px;padding:2px 6px;font-size:0.6rem;font-weight:800;">x${f.rewatch}</div>` : '';
@@ -2777,9 +3035,17 @@ function renderLibrary() {
             <div class="lib-info"><div class="lib-title">${escapeHtml(f.title)}</div><div class="lib-meta"><div class="lib-rating"><i class="bi bi-star-fill"></i> ${f.rating||0}/10</div><div class="lib-genre">${escapeHtml((f.genres||[])[0]||'')}</div></div></div>
           </div>`;
         }
-        return `<div class="lib-card" onclick="if(!_lpFired)openDetail('${f.id}')" oncontextmenu="return false" ontouchstart="libLongPressStart(event,'${f.id}')" ontouchmove="libLongPressMove(event)" ontouchend="libLongPressEnd(event)" onmousedown="libLongPressStart(event,'${f.id}')" onmouseup="libLongPressEnd(event)" onmousemove="libLongPressMove(event)"><div class="lib-poster" style="position:relative;">${f.poster ? `<img src="${f.poster}" loading="lazy" draggable="false">` : '<div style="display:flex;height:100%;align-items:center;justify-content:center;color:var(--text3);font-size:2rem;"><i class="bi bi-film"></i></div>'}${ageBadgeLib}${rewatchBadge}${countryBadgeLib}</div><div class="lib-info"><div class="lib-title">${escapeHtml(f.title)}</div><div class="lib-meta"><div class="lib-rating"><i class="bi bi-star-fill"></i> ${f.rating||0}/10</div><div class="lib-genre">${escapeHtml((f.genres||[])[0]||'')}</div></div></div></div>`;
+        return `<div class="lib-card-swipe-wrap">
+          <div class="lib-card-swipe-actions">
+            <div class="lib-swipe-btn lib-swipe-btn-edit" onclick="event.stopPropagation();openEditFilm('${f.id}')"><i class="bi bi-pencil"></i>Edit</div>
+            <div class="lib-swipe-btn lib-swipe-btn-del" onclick="event.stopPropagation();_swipeDeleteFilm('${f.id}')"><i class="bi bi-trash"></i>Hapus</div>
+          </div>
+          <div class="lib-card-inner"><div class="lib-card" onclick="if(!_lpFired)openDetail('${f.id}')" oncontextmenu="return false" ontouchstart="libLongPressStart(event,'${f.id}')" ontouchmove="libLongPressMove(event)" ontouchend="libLongPressEnd(event)" onmousedown="libLongPressStart(event,'${f.id}')" onmouseup="libLongPressEnd(event)" onmousemove="libLongPressMove(event)"><div class="lib-poster" style="position:relative;">${f.poster ? `<img src="${f.poster}" loading="lazy" draggable="false">` : '<div style="display:flex;height:100%;align-items:center;justify-content:center;color:var(--text3);font-size:2rem;"><i class="bi bi-film"></i></div>'}${ageBadgeLib}${rewatchBadge}${countryBadgeLib}</div><div class="lib-info"><div class="lib-title">${escapeHtml(f.title)}</div><div class="lib-meta"><div class="lib-rating"><i class="bi bi-star-fill"></i> ${f.rating||0}/10</div><div class="lib-genre">${escapeHtml((f.genres||[])[0]||'')}</div></div></div></div></div>
+        </div>`;
       }).join('');
   } catch(e) { console.error("Error Library Render:", e); }
+  // Init swipe gestures after render
+  setTimeout(_initAllCardSwipes, 60);
 }
 function renderStats() {
   const el = document.getElementById('statsContent');
@@ -2959,7 +3225,7 @@ function renderStats() {
       const groupEntries = Object.entries(groups);
       return `<div class="glass-card" style="padding:16px;border-radius:16px;margin-bottom:32px;">
         <div style="font-size:0.8rem;font-weight:700;color:var(--text);margin-bottom:14px;">Perjalanan Nonton</div>
-        <div style="position:relative;padding-left:24px;">
+        <div style="position:relative;padding-left:24px;max-height:216px;overflow-y:auto;overflow-x:hidden;">
           <div style="position:absolute;left:7px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--red),rgba(216,0,12,0.1));border-radius:2px;"></div>
           ${groupEntries.map(([key, fList], idx) => {
             const [yr, mo] = key.split('-');
@@ -2968,7 +3234,7 @@ function renderStats() {
             return `<div style="position:relative;margin-bottom:${idx<groupEntries.length-1?'16px':'0'};">
               <div style="position:absolute;left:-20px;top:4px;width:10px;height:10px;border-radius:50%;background:${idx===groupEntries.length-1?'var(--red)':'var(--card)'};border:2px solid ${idx===groupEntries.length-1?'var(--red)':'var(--border)'};"></div>
               <div style="display:flex;align-items:center;gap:10px;">
-                <div>
+                <div style="min-width:60px;flex-shrink:0;">
                   <div style="font-size:0.72rem;font-weight:700;color:var(--text);margin-bottom:4px;">${monthName}</div>
                   <div style="font-size:0.65rem;color:var(--text3);">${fList.length} shows</div>
                 </div>
@@ -3927,6 +4193,7 @@ function saveFilm() {
       transferProgId = null; renderProgress(); 
   } 
   save(); closeModal('filmModal');
+  if(navigator.vibrate)navigator.vibrate([30,20,30]);
   renderHome();
   if (currentPage === 'library') renderLibrary();
   if (currentPage === 'history' || currentPage === 'home') renderHistory();
@@ -3997,6 +4264,11 @@ function openUlasan() {
         openModal('ulasanModal');
     }
 }
+function openEditFilm(filmId) {
+  // Open detail then trigger edit — set detailFilmId first
+  detailFilmId = filmId;
+  editFromDetail();
+}
 function editFromDetail() {
   const f = DB.films.find(x => x.id === detailFilmId); if (!f) return; editingFilmId = f.id; 
   document.getElementById('filmModalTitle').textContent = 'Edit Shows'; document.getElementById('filmTitle').value = f.title; document.getElementById('filmLinkInput').value = f.filmLink || ''; document.getElementById('filmYear').value = f.year; document.getElementById('filmType').value = f.type || 'movie'; toggleFilmFields();
@@ -4064,23 +4336,330 @@ function fallbackCopy(text, tipe) {
   catch(e) { toast('Gagal menyalin link.'); }
   document.body.removeChild(ta);
 }
-function deleteFromDetail() {
-  showConfirm('Hapus shows ini dari lemari?', 'Hapus').then(ok => {
-    if (!ok) return;
-    const f = DB.films.find(x => x.id === detailFilmId);
-    if (f) {
-      DB.films = DB.films.filter(x => x.id !== detailFilmId);
-      DB.history.unshift({ id: uid(), type: 'delete_film', filmTitle: f.title, payload: f, ts: Date.now() });
-      save(); closeModal('detailModal'); toast('Film dihapus.');
-      renderHome();
-      if (currentPage === 'library') renderLibrary();
-      if (currentPage === 'history') renderHistory();
+// ============================================================
+// SWIPE GESTURE LIBRARY CARDS
+// ============================================================
+var _swipeState = {};
+var _currentSwipedCard = null;
+
+function _initCardSwipe(wrap) {
+  if (!wrap || wrap._swipeInit) return;
+  wrap._swipeInit = true;
+  var inner = wrap.querySelector('.lib-card-inner');
+  if (!inner) return;
+  var startX = 0, startY = 0, dragging = false, moved = false, startTime = 0;
+  var THRESHOLD = 50; // px to trigger swipe
+  var SWIPE_W = 130;
+
+  function closeAllSwipes(except) {
+    document.querySelectorAll('.lib-card-swipe-wrap.swiped').forEach(function(w) {
+      if (w !== except) { w.classList.remove('swiped'); }
+    });
+  }
+
+  inner.addEventListener('touchstart', function(e) {
+    if (wrap.closest && wrap.closest('[id="bulkActionBar"]')) return;
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    startTime = Date.now();
+    dragging = true; moved = false;
+    inner.style.transition = 'none';
+  }, { passive: true });
+
+  inner.addEventListener('touchmove', function(e) {
+    if (!dragging) return;
+    var dx = e.touches[0].clientX - startX;
+    var dy = e.touches[0].clientY - startY;
+    if (!moved && Math.abs(dy) > Math.abs(dx)) { dragging = false; return; }
+    if (Math.abs(dx) > 5) moved = true;
+    if (!moved) return;
+    if (dx < 0) {
+      var x = Math.max(-SWIPE_W, dx);
+      inner.style.transform = 'translateX(' + x + 'px)';
+    } else if (wrap.classList.contains('swiped')) {
+      var x2 = Math.min(0, -SWIPE_W + dx);
+      inner.style.transform = 'translateX(' + x2 + 'px)';
     }
+  }, { passive: true });
+
+  inner.addEventListener('touchend', function(e) {
+    if (!dragging) return;
+    dragging = false;
+    inner.style.transition = '';
+    var dx = e.changedTouches[0].clientX - startX;
+    if (!moved) return;
+    if (dx < -THRESHOLD) {
+      // open swipe
+      closeAllSwipes(wrap);
+      wrap.classList.add('swiped');
+      if (navigator.vibrate) navigator.vibrate(25);
+    } else {
+      wrap.classList.remove('swiped');
+    }
+    inner.style.transform = '';
+  }, { passive: true });
+
+  // Close on tap outside
+  document.addEventListener('touchstart', function(e) {
+    if (wrap.classList.contains('swiped') && !wrap.contains(e.target)) {
+      wrap.classList.remove('swiped');
+    }
+  }, { passive: true });
+}
+
+function _initAllCardSwipes() {
+  document.querySelectorAll('.lib-card-swipe-wrap').forEach(function(w) { _initCardSwipe(w); });
+}
+
+function _moveToWatchlistFromLibCard(filmId) {
+  var f = DB.films.find(function(x){ return x.id === filmId; });
+  if (!f) return;
+  var w = { id: uid(), title: f.title, genre: (f.genres||[])[0]||'', poster: f.poster||'', note: '', filmLink: f.filmLink||'', releaseDate: '', addedAt: Date.now() };
+  DB.watchlist.push(w);
+  DB.films = DB.films.filter(function(x){ return x.id !== filmId; });
+  DB.history.unshift({ id: uid(), type: 'delete_film', filmTitle: f.title, payload: f, ts: Date.now() });
+  DB.history.unshift({ id: uid(), type: 'watchlist_add', filmTitle: f.title, payload: w, ts: Date.now() });
+  save(); renderHome(); renderLibrary();
+  if (navigator.vibrate) navigator.vibrate(40);
+  toast('"' + f.title + '" dipindah ke Watchlist!');
+}
+
+// ============================================================
+// UNDO TOAST SYSTEM
+// ============================================================
+var _undoToastTimer = null;
+var _undoToastData = null; // {type: 'film'|'wl'|'progress', payload, onUndo, onCommit}
+
+function showUndoToast(msg, undoCallback, commitCallback) {
+  if (_undoToastTimer) {
+    clearTimeout(_undoToastTimer);
+    if (_undoToastData && _undoToastData.onCommit) _undoToastData.onCommit();
+  }
+  _undoToastData = { onUndo: undoCallback, onCommit: commitCallback };
+  const el = document.getElementById('undoToast');
+  const msgEl = document.getElementById('undoToastMsg');
+  const barEl = document.getElementById('undoToastBar');
+  if (!el) return;
+  if (msgEl) msgEl.textContent = msg;
+  // Reset bar animation
+  if (barEl) { barEl.style.animation = 'none'; void barEl.offsetWidth; barEl.style.animation = 'undoBarShrink 5s linear forwards'; }
+  el.classList.add('show');
+  if (navigator.vibrate) navigator.vibrate(30);
+  _undoToastTimer = setTimeout(function() {
+    el.classList.remove('show');
+    if (_undoToastData && _undoToastData.onCommit) _undoToastData.onCommit();
+    _undoToastData = null; _undoToastTimer = null;
+  }, 5000);
+}
+function execUndoToast() {
+  if (!_undoToastData) return;
+  clearTimeout(_undoToastTimer); _undoToastTimer = null;
+  const el = document.getElementById('undoToast');
+  if (el) el.classList.remove('show');
+  if (_undoToastData.onUndo) _undoToastData.onUndo();
+  if (navigator.vibrate) navigator.vibrate([20, 40, 20]);
+  _undoToastData = null;
+}
+
+function _swipeDeleteFilm(filmId) {
+  var f = DB.films.find(function(x){ return x.id === filmId; });
+  if (!f) return;
+  var removedFilm = Object.assign({}, f);
+  DB.films = DB.films.filter(function(x){ return x.id !== filmId; });
+  save(); renderHome(); renderLibrary();
+  if (navigator.vibrate) navigator.vibrate(40);
+  showUndoToast('"' + removedFilm.title + '" dihapus', function() {
+    DB.films.push(removedFilm);
+    save(); renderHome(); renderLibrary();
+    toast('"' + removedFilm.title + '" dikembalikan!');
+  }, function() {
+    DB.history.unshift({ id: uid(), type: 'delete_film', filmTitle: removedFilm.title, payload: removedFilm, ts: Date.now() });
+    save();
+  });
+}
+function deleteFromDetail() {
+  const f = DB.films.find(x => x.id === detailFilmId);
+  if (!f) return;
+  const removedId = f.id;
+  const removedFilm = Object.assign({}, f);
+  // Hapus langsung dari DB (optimistic)
+  DB.films = DB.films.filter(x => x.id !== removedId);
+  save(); closeModal('detailModal');
+  renderHome();
+  if (currentPage === 'library') renderLibrary();
+  if (currentPage === 'history') renderHistory();
+  if (navigator.vibrate) navigator.vibrate(40);
+  showUndoToast('"' + removedFilm.title + '" dihapus', function() {
+    // Undo: kembalikan film
+    DB.films.push(removedFilm);
+    save(); renderHome();
+    if (currentPage === 'library') renderLibrary();
+    toast('"' + removedFilm.title + '" dikembalikan!');
+  }, function() {
+    // Commit: baru tulis ke history
+    DB.history.unshift({ id: uid(), type: 'delete_film', filmTitle: removedFilm.title, payload: removedFilm, ts: Date.now() });
+    save();
+    if (currentPage === 'history') renderHistory();
   });
 }
 function openEditProfile() { document.getElementById('editName').value = DB.profile.name; openModal('profileModal'); }
 function saveProfile() { DB.profile.name = document.getElementById('editName').value.trim() || 'Nama Kamu'; save(); closeModal('profileModal'); renderHome(); toast('Profil tersimpan!'); }
-function backupData() { const data = JSON.stringify(DB, null, 2); const blob = new Blob([data], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `elevens_backup_${new Date().toISOString().slice(0,10)}.json`; a.click(); toast('Data berhasil diunduh!'); }
+function backupData() { openModal('backupFormatModal'); }
+function markBackupDone() {
+  DB.settings.lastBackupAt = Date.now();
+  save();
+  updateBackupSizeUI();
+}
+function downloadBackupJSON() {
+  const data = JSON.stringify(DB, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `elevens_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  markBackupDone();
+  closeModal('backupFormatModal');
+  toast('Backup JSON berhasil diunduh!');
+}
+// Helper umum: bungkus nilai untuk 1 sel CSV (escape koma, kutip, newline sesuai RFC 4180)
+function csvCell(val) {
+  let s = (val === null || val === undefined) ? '' : String(val);
+  if (/[",\n]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"';
+  return s;
+}
+function downloadBackupCSV() {
+  const headers = ['No','Judul','Tahun','Tipe','Genre','Negara','Rating Usia','Mood','Durasi (menit)','Episode Ditonton','Rating','Sinopsis','Ulasan Pribadi','Ulasan Terkunci','Jumlah Rewatch','Tanggal Ditambahkan'];
+  const rows = DB.films.map((f, i) => [
+    i + 1,
+    f.title || '',
+    f.year || '',
+    f.type === 'series' ? 'Series' : (f.type === 'anime' ? 'Anime' : 'Movie'),
+    Array.isArray(f.genres) ? f.genres.join('; ') : '',
+    f.country || '',
+    f.ageRating || '',
+    f.mood || '',
+    f.duration || 0,
+    (f.type === 'series' || f.type === 'anime') ? (f.watchedEps || '') : '',
+    f.rating || 0,
+    f.comment || '',
+    f.secureUlasan ? '(terkunci, tidak diexport)' : (f.ulasan || ''),
+    f.secureUlasan ? 'Ya' : 'Tidak',
+    f.rewatch || 0,
+    f.addedAt ? new Date(f.addedAt).toLocaleDateString('id-ID') : ''
+  ]);
+  const csvLines = [headers.map(csvCell).join(',')].concat(rows.map(r => r.map(csvCell).join(',')));
+  // BOM \uFEFF agar Excel membaca karakter UTF-8 (misal judul ber-aksen) dengan benar
+  const blob = new Blob(['\uFEFF' + csvLines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `elevens_koleksi_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  markBackupDone();
+  closeModal('backupFormatModal');
+  toast('Export CSV berhasil diunduh!');
+}
+function downloadBackupExcel() {
+  if (typeof XLSX === 'undefined') { toast('Modul Excel gagal dimuat. Coba lagi atau gunakan format CSV.'); return; }
+  const headers = ['No','Judul','Tahun','Tipe','Genre','Negara','Rating Usia','Mood','Durasi (menit)','Episode Ditonton','Rating (0-10)','Sinopsis','Ulasan Pribadi','Ulasan Terkunci','Jumlah Rewatch','Tanggal Ditambahkan'];
+  const rows = DB.films.map((f, i) => [
+    i + 1,
+    f.title || '',
+    f.year || '',
+    f.type === 'series' ? 'Series' : (f.type === 'anime' ? 'Anime' : 'Movie'),
+    Array.isArray(f.genres) ? f.genres.join(', ') : '',
+    f.country || '',
+    f.ageRating || '',
+    f.mood || '',
+    f.duration || 0,
+    (f.type === 'series' || f.type === 'anime') ? (f.watchedEps || '') : '',
+    f.rating || 0,
+    f.comment || '',
+    f.secureUlasan ? '(terkunci, tidak diexport)' : (f.ulasan || ''),
+    f.secureUlasan ? 'Ya' : 'Tidak',
+    f.rewatch || 0,
+    f.addedAt ? new Date(f.addedAt).toLocaleDateString('id-ID') : ''
+  ]);
+  const wsData = [headers].concat(rows);
+  const ws = XLSX.utils.aoa_to_sheet(wsData);
+  // Atur lebar kolom agar rapi & enak dibaca di Excel/Sheets
+  ws['!cols'] = [
+    { wch: 5 },  { wch: 32 }, { wch: 7 },  { wch: 9 },  { wch: 24 },
+    { wch: 14 }, { wch: 11 }, { wch: 12 }, { wch: 13 }, { wch: 14 },
+    { wch: 11 }, { wch: 40 }, { wch: 40 }, { wch: 13 }, { wch: 12 }, { wch: 16 }
+  ];
+  // Freeze header row supaya tetap kelihatan saat scroll panjang
+  ws['!freeze'] = { xSplit: 0, ySplit: 1 };
+  ws['!autofilter'] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: rows.length, c: headers.length - 1 } }) };
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Koleksi Elevens');
+  XLSX.writeFile(wb, `elevens_koleksi_${new Date().toISOString().slice(0,10)}.xlsx`);
+  markBackupDone();
+  closeModal('backupFormatModal');
+  toast('Export Excel berhasil diunduh!');
+}
+// Estimasi ukuran data tersimpan saat ini (berdasarkan ukuran string JSON DB), untuk ditampilkan di Settings
+function getBackupSizeEstimate() {
+  try {
+    const bytes = new Blob([JSON.stringify(DB)]).size;
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+  } catch(e) { return '–'; }
+}
+function updateBackupSizeUI() {
+  const sizeEl = document.getElementById('backupSizeDesc');
+  if (sizeEl) sizeEl.textContent = `${getBackupSizeEstimate()} · ${DB.films.length} film, ${DB.history.length} histori`;
+  const lastEl = document.getElementById('lastBackupDesc');
+  if (lastEl) {
+    if (DB.settings && DB.settings.lastBackupAt) {
+      lastEl.textContent = 'Backup terakhir: ' + new Date(DB.settings.lastBackupAt).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' });
+    } else {
+      lastEl.textContent = 'Belum pernah backup';
+    }
+  }
+}
+// Cek apakah sudah waktunya mengingatkan user untuk backup, dipanggil tiap kali app dibuka
+function checkAutoBackupReminder() {
+  const days = DB.settings && DB.settings.autoBackupDays;
+  if (!days || days <= 0) return;
+  const last = (DB.settings && DB.settings.lastBackupAt) || 0;
+  const elapsedDays = last ? Math.floor((Date.now() - last) / (1000 * 60 * 60 * 24)) : null;
+  if (elapsedDays === null) {
+    toast(`Kamu belum pernah backup data. Yuk backup sekarang!`);
+  } else if (elapsedDays >= days) {
+    toast(`Sudah ${elapsedDays} hari sejak backup terakhir. Yuk backup lagi!`);
+  }
+}
+// Hapus entri history yang lebih tua dari batas bulan yang diatur user (0 = tidak pernah dihapus otomatis)
+function trimOldHistory() {
+  const months = DB.settings && DB.settings.historyMaxMonths;
+  if (!months || months <= 0) return;
+  const cutoff = Date.now() - (months * 30 * 24 * 60 * 60 * 1000);
+  const before = DB.history.length;
+  DB.history = DB.history.filter(h => h && typeof h.ts === 'number' && h.ts >= cutoff);
+  if (DB.history.length !== before) save();
+}
+// Isi ulang tampilan info data di halaman Settings: ukuran data, tanggal backup terakhir, dan nilai dropdown
+function renderSettingsDataInfo() {
+  updateBackupSizeUI();
+  const abSel = document.getElementById('autoBackupDaysSelect');
+  if (abSel) { abSel.value = String((DB.settings && DB.settings.autoBackupDays) || 0); syncSelBtn('autoBackupDaysSelect'); }
+  const hmSel = document.getElementById('historyMaxMonthsSelect');
+  if (hmSel) { hmSel.value = String((DB.settings && DB.settings.historyMaxMonths) || 0); syncSelBtn('historyMaxMonthsSelect'); }
+}
+function setAutoBackupDays(val) {
+  DB.settings.autoBackupDays = parseInt(val) || 0;
+  save();
+  toast(DB.settings.autoBackupDays > 0 ? `Pengingat backup diatur setiap ${DB.settings.autoBackupDays} hari.` : 'Pengingat backup otomatis dimatikan.');
+}
+function setHistoryMaxMonths(val) {
+  DB.settings.historyMaxMonths = parseInt(val) || 0;
+  trimOldHistory();
+  save();
+  updateBackupSizeUI();
+  if (currentPage === 'history') renderHistory();
+  toast(DB.settings.historyMaxMonths > 0 ? `History lama akan otomatis dihapus setelah ${DB.settings.historyMaxMonths} bulan.` : 'Penghapusan history otomatis dimatikan.');
+}
 function restoreData(input) { 
   const file = input.files[0]; if (!file) return; 
   const reader = new FileReader(); 
@@ -4099,7 +4678,12 @@ function restoreData(input) {
         progress: Array.isArray(parsed.progress) ? parsed.progress.filter(p => p && typeof p === 'object') : [],
         watchlist: Array.isArray(parsed.watchlist) ? parsed.watchlist.filter(w => w && typeof w === 'object') : [],
         history: Array.isArray(parsed.history) ? parsed.history.filter(h => h && typeof h === 'object') : [],
-        theme: (parsed.theme === 'light' || parsed.theme === 'dark') ? parsed.theme : 'dark'
+        theme: (parsed.theme === 'light' || parsed.theme === 'dark') ? parsed.theme : 'dark',
+        settings: (parsed.settings && typeof parsed.settings === 'object') ? {
+          autoBackupDays: typeof parsed.settings.autoBackupDays === 'number' ? parsed.settings.autoBackupDays : 0,
+          lastBackupAt: typeof parsed.settings.lastBackupAt === 'number' ? parsed.settings.lastBackupAt : 0,
+          historyMaxMonths: typeof parsed.settings.historyMaxMonths === 'number' ? parsed.settings.historyMaxMonths : 0
+        } : { autoBackupDays: 0, lastBackupAt: 0, historyMaxMonths: 0 }
       };
       if (!parsed.profile && !Array.isArray(parsed.films)) {
         toast('File backup tidak valid: struktur data tidak dikenali.');
@@ -4436,14 +5020,20 @@ function initApp() {
     if (!Array.isArray(DB.watchlist)) DB.watchlist = [];
     if (!Array.isArray(DB.history)) DB.history = [];
     if (!DB.theme) DB.theme = 'dark';
+    if (!DB.settings || typeof DB.settings !== 'object') DB.settings = {};
+    if (typeof DB.settings.autoBackupDays !== 'number') DB.settings.autoBackupDays = 0;
+    if (typeof DB.settings.lastBackupAt !== 'number') DB.settings.lastBackupAt = 0;
+    if (typeof DB.settings.historyMaxMonths !== 'number') DB.settings.historyMaxMonths = 0;
     DB.films = DB.films.filter(f => f && typeof f === 'object');
     DB.progress = DB.progress.filter(p => p && typeof p === 'object');
     DB.watchlist = DB.watchlist.filter(w => w && typeof w === 'object');
+    trimOldHistory();
     try {
       document.documentElement.setAttribute('data-theme', DB.theme);
       const tg = document.getElementById('themeToggle');
       if (tg) tg.className = 'toggle ' + (DB.theme === 'dark' ? 'on' : '');
       document.getElementById('mainFab').style.display = 'none';
+      showLibrarySkeleton();
       renderHome();
       renderLibrary();
       // Restore halaman terakhir sebelum refresh
@@ -4454,6 +5044,7 @@ function initApp() {
           navTo(savedPage);
         }
       } catch(e) {}
+      checkAutoBackupReminder();
     } catch(renderError) {
       console.error("UI Render Failed:", renderError);
     }
@@ -4589,6 +5180,15 @@ function processPinInput() {
         } else {
             pinDotsError();
             document.getElementById('pinError').textContent = 'PIN lama salah';
+        }
+    } else if (_pinMode === 'custom_dev_api') {
+        // PIN Developer tetap untuk akses kustomisasi API Key
+        if (entered === _DEVELOPER_API_PIN) {
+            closePinModal();
+            if (_pinCallback) _pinCallback(true);
+        } else {
+            pinDotsError();
+            document.getElementById('pinError').textContent = 'PIN Developer salah';
         }
     }
 }
@@ -4757,10 +5357,18 @@ function updateTmdbKeyDesc(){
   var el=document.getElementById('tmdbKeyDesc');
   if(el) el.textContent=k?'Key kustom aktif — klik untuk ubah':'Key bawaan aktif';
 }
+var _DEVELOPER_API_PIN = '1324';
 function openTmdbKeyModal(){
-  var el=document.getElementById('tmdbKeyModalInput');
-  if(el) el.value=getTmdbKey();
-  openModal('tmdbKeyModal');
+  // Wajib verifikasi PIN Developer sebelum bisa kustomisasi API Key
+  openPinModal('Developer API Access', 'Masukkan PIN Developer untuk kustomisasi TMDb API Key', 'custom_dev_api', function(ok){
+    if(ok){
+      var el=document.getElementById('tmdbKeyModalInput');
+      if(el) el.value=getTmdbKey();
+      openModal('tmdbKeyModal');
+    } else {
+      toast('Akses ditolak. PIN Developer salah.');
+    }
+  });
 }
 function saveTmdbKeyModal(){
   var el=document.getElementById('tmdbKeyModalInput');
@@ -4894,6 +5502,50 @@ async function _tmdbPosterB64(posterPath){
     });
   }catch(e){return url;}
 }
+function _tmdbExtractAgeRating(ratingData, isMovie) {
+  try {
+    if (isMovie) {
+      // movie/release_dates: results array, look for US first then ID then first available
+      var results = ratingData.results || [];
+      var preferred = ['US','ID','GB','AU'];
+      var found = '';
+      for (var pi = 0; pi < preferred.length; pi++) {
+        var entry = results.find(function(x){ return x.iso_3166_1 === preferred[pi]; });
+        if (entry && entry.release_dates && entry.release_dates.length) {
+          var cert = (entry.release_dates.find(function(rd){ return rd.certification && rd.certification.trim(); }) || {}).certification || '';
+          if (cert) { found = cert; break; }
+        }
+      }
+      if (!found) {
+        // fallback: first country with any certification
+        for (var ri = 0; ri < results.length; ri++) {
+          var rds = results[ri].release_dates || [];
+          for (var rdi = 0; rdi < rds.length; rdi++) {
+            if (rds[rdi].certification && rds[rdi].certification.trim()) {
+              found = rds[rdi].certification; break;
+            }
+          }
+          if (found) break;
+        }
+      }
+      return found;
+    } else {
+      // tv/content_ratings: results array
+      var tvResults = ratingData.results || [];
+      var tvPreferred = ['US','ID','GB','AU'];
+      var tvFound = '';
+      for (var ti = 0; ti < tvPreferred.length; ti++) {
+        var tvEntry = tvResults.find(function(x){ return x.iso_3166_1 === tvPreferred[ti]; });
+        if (tvEntry && tvEntry.rating && tvEntry.rating.trim()) { tvFound = tvEntry.rating; break; }
+      }
+      if (!tvFound && tvResults.length) {
+        tvFound = (tvResults.find(function(x){ return x.rating && x.rating.trim(); }) || {}).rating || '';
+      }
+      return tvFound;
+    }
+  } catch(e) { return ''; }
+}
+
 async function selectTmdbResult(idx){
   var r=_tmdbResults[idx];if(!r)return;
   var area=document.getElementById('tmdbResultsArea');
@@ -4901,9 +5553,17 @@ async function selectTmdbResult(idx){
   var key=getTmdbKey();
   var isMovie=r.media_type==='movie';
   try{
-    var res=await fetch('https://api.themoviedb.org/3/'+(isMovie?'movie':'tv')+'/'+r.id+'?api_key='+encodeURIComponent(key)+'&language=en-US');
+    var mediaType = isMovie ? 'movie' : 'tv';
+    var ratingEndpoint = isMovie ? 'release_dates' : 'content_ratings';
+    // Fetch detail dan rating usia secara paralel
+    var [res, ratingRes] = await Promise.all([
+      fetch('https://api.themoviedb.org/3/'+mediaType+'/'+r.id+'?api_key='+encodeURIComponent(key)+'&language=en-US'),
+      fetch('https://api.themoviedb.org/3/'+mediaType+'/'+r.id+'/'+ratingEndpoint+'?api_key='+encodeURIComponent(key))
+    ]);
     if(!res.ok){if(area)area.innerHTML='<div class="tmdb-empty"><i class="bi bi-x-circle"></i><br>Gagal mengambil detail.</div>';return;}
     var d=await res.json();
+    var ratingData = ratingRes.ok ? await ratingRes.json() : {};
+    var ageRating = _tmdbExtractAgeRating(ratingData, isMovie);
     var title=isMovie?(d.title||d.original_title):(d.name||d.original_name);
     var year=(isMovie?d.release_date:d.first_air_date||'').slice(0,4);
     var genres=_tmdbMapGenres(d.genres);
@@ -4916,7 +5576,7 @@ async function selectTmdbResult(idx){
     else{var ep=d.episode_run_time||[];avgEp=ep.length?Math.round(ep.reduce(function(a,b){return a+b;},0)/ep.length):0;totalEps=d.number_of_episodes||0;}
     var poster=await _tmdbPosterB64(d.poster_path);
     var releaseDate=isMovie?(d.release_date||''):(d.next_episode_to_air?d.next_episode_to_air.air_date||'':(d.first_air_date||''));
-    _pendingTmdbData={title:title,year:year,type:type,genres:genres,country:country,overview:d.overview||'',poster:poster,durMins:durMins,avgEp:avgEp,totalEps:totalEps,releaseDate:releaseDate};
+    _pendingTmdbData={title:title,year:year,type:type,genres:genres,country:country,overview:d.overview||'',poster:poster,durMins:durMins,avgEp:avgEp,totalEps:totalEps,releaseDate:releaseDate,ageRating:ageRating};
     closeModal('tmdbSearchModal');
     if(_tmdbCallback==='watchlist'){_fillWatchlistFromTmdb(_pendingTmdbData);}
     else if(_tmdbCallback==='progress'){_fillProgressFromTmdb(_pendingTmdbData);}
@@ -4941,6 +5601,8 @@ function _openTmdbQuickForm(){
   if(me){var parts=[tl[d.type]||d.type];if(d.country)parts.push(d.country);if(d.durMins>0)parts.push(Math.floor(d.durMins/60)+'j '+d.durMins%60+'m');else if(d.avgEp>0)parts.push('~'+d.avgEp+' mnt/ep');me.textContent=parts.join(' · ');}
   var ge=document.getElementById('tmdbQGenres');
   if(ge)ge.innerHTML=(d.genres||[]).slice(0,4).map(function(g){return '<span style="padding:2px 8px;border-radius:7px;background:rgba(255,255,255,.07);border:1px solid var(--border);font-size:.6rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;">'+escapeHtml(g)+'</span>';}).join('');
+  var ageEl=document.getElementById('tmdbQAgeBadge');
+  if(ageEl){if(d.ageRating){ageEl.style.display='inline-flex';ageEl.textContent=d.ageRating;}else{ageEl.style.display='none';}}
   var isSeries=d.type==='series'||d.type==='anime';
   var eg=document.getElementById('tmdbQEpsGroup');
   if(eg){
@@ -4980,7 +5642,7 @@ function saveTmdbFilm(){
   var film={
     id:uid(),title:d.title,filmLink:link,year:d.year||'',
     duration:finalDur,durEps:isSeries?(d.avgEp||null):null,
-    watchedEps:eps2,type:d.type,genres:d.genres||[],ageRating:'',
+    watchedEps:eps2,type:d.type,genres:d.genres||[],ageRating:d.ageRating||'',
     country:d.country||'',countryAbbr:d.country?getCountryAbbr(d.country):'',
     countryGradient:'',rating:rating,comment:d.overview||'',ulasan:ulasan,
     secureUlasan:_tmdbIsUlasanSecure,poster:d.poster||'',mood:'',rewatch:0,addedAt:Date.now()
@@ -4993,6 +5655,7 @@ function saveTmdbFilm(){
     transferWlId=null;
   }
   save();closeModal('filmModal');
+  if(navigator.vibrate)navigator.vibrate([30,20,30]);
   renderHome();
   if(currentPage==='library')renderLibrary();
   if(currentPage==='history')renderHistory();
@@ -5026,6 +5689,7 @@ function switchToFullForm(){
   }
   if(d.poster){document.getElementById('posterPreview').src=d.poster;document.getElementById('posterPreview').style.display='block';document.getElementById('posterPh').style.display='none';document.getElementById('currentPosterData').value=d.poster;}
   if(d.country)setCountryUI(d.country,getCountryAbbr(d.country),'');
+  if(d.ageRating)setAgeRatingUI(d.ageRating);
   currentSelectedGenres=[].concat(d.genres||[]);
   document.querySelectorAll('#genreMulti .genre-check').forEach(function(g){g.classList.toggle('selected',currentSelectedGenres.indexOf(g.dataset.g)>=0);});
   updateGenrePreview();
@@ -5117,4 +5781,4 @@ function _updateMonthlyChart() {
 }
 </script>
 </body>
-</html>
+        </html>
