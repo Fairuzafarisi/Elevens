@@ -4,11 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Elevens</title>
+<meta name="theme-color" content="#030305">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,800;0,900;1,800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"></noscript>
 <style>
 :root {
   --bg: #030305; --bg2: #09090c; --bg3: #111116; --bg4: #181820;
@@ -37,19 +39,21 @@
 .toggle::after { transition: left 0.3s; }
 .bar-item { transition: color 0.3s, opacity 0.3s; }
 .bar-item .bi { transition: color 0.3s, filter 0.3s, transform 0.3s; }
-.film-card-h { transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s; }
+.film-card-h { transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.22s; }
 .genre-pill { transition: background 0.25s, border-color 0.25s, color 0.25s; }
 .icon-btn { transition: all 0.3s ease; }
 .lib-card-inner { transition: transform 0.28s cubic-bezier(0.2,0.8,0.2,1); }
-html{scroll-behavior:smooth;}
+html{scroll-behavior:smooth; scrollbar-width:none; -ms-overflow-style:none;}
+html::-webkit-scrollbar{width:0;height:0;display:none;}
 body{
   font-family:'DM Sans',sans-serif; color:var(--text);
   min-height:100vh; max-width:480px; margin:0 auto; position:relative; overflow-x:hidden;
   overscroll-behavior: none;
   background-color: var(--bg);
   background-image: none;
-  background-attachment: fixed;
   scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 [data-theme="light"] body {
   background-image: none;
@@ -65,6 +69,7 @@ body::before, body::after {
   width: 0px;
   z-index: 9998;
   pointer-events: none;
+  will-change: transform;
 }
 body::before {
   left: 50%;
@@ -99,9 +104,10 @@ body::after {
   background-size: 200% 100%;
   animation: shimmer 1.4s infinite;
   border-radius: 8px;
+  contain: layout style paint;
 }
 .skeleton-card {
-  flex-shrink: 0; width: 150px;
+  flex-shrink: 0; width: 150px; contain: layout style paint;
 }
 .skeleton-poster {
   width: 150px; aspect-ratio: 2/3; border-radius: 16px;
@@ -122,16 +128,30 @@ body::after {
 .skeleton-lib-info {
   padding: 8px;
 }
-::-webkit-scrollbar{width:3px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--red);border-radius:4px;}
+::-webkit-scrollbar{width:0;height:0;display:none;}
+/* Custom scrollbar JS-driven */
+#customScrollbar {
+  position: fixed;
+  top: 0; right: 2px;
+  width: 3px;
+  height: 36px;
+  background: var(--red);
+  border-radius: 4px;
+  z-index: 2147483647;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  will-change: transform, height, opacity;
+  box-shadow: 0 0 8px 1px var(--red-glow);
+  mix-blend-mode: normal;
+}
 body.modal-open { overflow: hidden !important; touch-action: none; }
 /* LIQUID GLASS NAVIGATION - Ditingkatkan Blur dan Opacity */
 .top-nav{
   position:fixed;top:0;left:50%;transform:translateX(-50%);
   width:100%;max-width:480px; height:var(--nav-h);
   background:rgba(5,5,8,0.8); border-bottom:1px solid var(--border);
-  backdrop-filter:blur(40px) saturate(180%); -webkit-backdrop-filter:blur(40px) saturate(180%);
+  backdrop-filter:blur(20px) saturate(160%); -webkit-backdrop-filter:blur(20px) saturate(160%);
   display:flex;align-items:center;justify-content:space-between;
   padding:0 20px;z-index:100;
 }
@@ -157,9 +177,9 @@ body.modal-open { overflow: hidden !important; touch-action: none; }
 }
 .icon-btn:hover{background:var(--red);color:#fff;border-color:var(--red);box-shadow:0 4px 12px var(--red-glow);}
 #app{padding-top:var(--nav-h);padding-bottom:calc(var(--bar-h) + 100px);}
-.page{display:none; animation:fadeIn 0.32s cubic-bezier(0.25,0.46,0.45,0.94); will-change:opacity,transform;}
+.page{display:none; animation:fadeIn 0.28s cubic-bezier(0.25,0.46,0.45,0.94);}
 .page.active{display:block;}
-@keyframes fadeIn { from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+@keyframes fadeIn { from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
 @keyframes spin { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
 /* ============================================================ */
 /* UNDO TOAST                                                    */
@@ -168,7 +188,7 @@ body.modal-open { overflow: hidden !important; touch-action: none; }
   position: fixed; bottom: calc(var(--bar-h) + 16px); left: 50%; transform: translateX(-50%) translateY(20px);
   background: rgba(20,20,30,0.92); border: 1px solid rgba(255,255,255,0.16);
   border-radius: 16px; padding: 12px 16px; display: flex; align-items: center; gap: 12px;
-  backdrop-filter: blur(30px) saturate(160%); -webkit-backdrop-filter: blur(30px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(140%); -webkit-backdrop-filter: blur(16px) saturate(140%);
   box-shadow: 0 8px 32px rgba(0,0,0,0.4); z-index: 9000; white-space: nowrap;
   opacity: 0; pointer-events: none; transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.2,0.8,0.2,1);
   max-width: calc(100vw - 40px);
@@ -211,7 +231,7 @@ body.modal-open { overflow: hidden !important; touch-action: none; }
   position:fixed;bottom:0;left:50%;transform:translateX(-50%);
   width:100%;max-width:480px; height:var(--bar-h);
   background:rgba(5,5,8,0.85); border-top:1px solid var(--border);
-  backdrop-filter:blur(40px) saturate(180%); -webkit-backdrop-filter:blur(40px) saturate(180%);
+  backdrop-filter:blur(20px) saturate(160%); -webkit-backdrop-filter:blur(20px) saturate(160%);
   display:flex;align-items:center;justify-content:space-around; z-index:100;
   border-left:1px solid var(--border); border-right:1px solid var(--border);
   border-radius:0;
@@ -237,8 +257,8 @@ body.modal-open { overflow: hidden !important; touch-action: none; }
 /* LIQUID GLASS CARDS - Opacity & Blur dimaksimalkan */
 .glass-card {
   background: var(--card);
-  backdrop-filter: blur(30px) saturate(160%);
-  -webkit-backdrop-filter: blur(30px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
   border: 1px solid var(--border);
   box-shadow: 0 8px 32px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.06);
 }
@@ -262,11 +282,36 @@ body.modal-open { overflow: hidden !important; touch-action: none; }
 .avatar{
   width:86px;height:86px;border-radius:50%;
   border:3px solid var(--red); background:rgba(0,0,0,0.2);
-  display:flex;align-items:center;justify-content:center; overflow:hidden;cursor:pointer;
+  display:flex;align-items:center;justify-content:center; overflow:hidden;
   box-shadow:0 4px 15px var(--red-glow);
   background-size:cover; background-position:center;
 }
 .avatar-placeholder{font-size:2.5rem;color:var(--text3);}
+.profile-modal-avatar-wrap{position:relative;width:104px;height:104px;margin:4px auto 18px;cursor:pointer;}
+.profile-modal-avatar{
+  width:104px;height:104px;border-radius:50%;
+  border:3px solid var(--red); background:var(--card);
+  display:flex;align-items:center;justify-content:center; overflow:hidden;
+  box-shadow:0 4px 15px var(--red-glow);
+  background-size:cover; background-position:center;
+}
+.profile-modal-avatar .avatar-placeholder{font-size:2.8rem;}
+.profile-modal-pencil-badge{
+  position:absolute; right:-2px; bottom:-2px; width:32px;height:32px;border-radius:50%;
+  background:var(--red); border:3px solid var(--bg); display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(0,0,0,0.35);
+}
+.profile-modal-name-input{
+  width:100%; text-align:center; background:transparent; border:none; outline:none;
+  font-family:'DM Sans',sans-serif; font-size:1.15rem; font-weight:700; color:var(--text);
+  padding:8px 36px; border-bottom:1px solid var(--border); transition:border-color 0.2s;
+}
+.profile-modal-name-input:focus{border-color:var(--red);}
+.profile-modal-name-wrap{position:relative; max-width:280px; margin:0 auto 6px;}
+.profile-modal-name-wrap i{
+  position:absolute; right:6px; top:50%; transform:translateY(-50%);
+  font-size:0.95rem; color:var(--text3); pointer-events:none;
+}
 .profile-info{flex:1;}
 .profile-name{
   font-family:'DM Sans',sans-serif; font-size:1.25rem; font-weight:700;
@@ -302,15 +347,15 @@ body.modal-open { overflow: hidden !important; touch-action: none; }
 .genre-scroll::-webkit-scrollbar{display:none;}
 .genre-pill{
   flex-shrink:0;padding:8px 20px;border-radius:24px; background:var(--card);border:1px solid var(--border);
-  font-size:0.75rem;font-weight:500;cursor:pointer; transition:all 0.3s;color:var(--text2);white-space:nowrap; letter-spacing:0.04em;
-  backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+  font-size:0.75rem;font-weight:500;cursor:pointer; transition:border-color 0.2s, background 0.2s;color:var(--text2);white-space:nowrap; letter-spacing:0.04em;
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
 }
 .genre-pill:hover{border-color:var(--text3);}
 .genre-pill.active{background:var(--text);border-color:var(--text);color:var(--bg);}
 .film-row{ display:flex;gap:16px;overflow-x:auto;padding:10px 20px 20px;scrollbar-width:none; align-items:stretch; min-height:260px; -webkit-overflow-scrolling:touch; }
 .film-row::-webkit-scrollbar{display:none;}
-.film-card-h{ flex-shrink:0;width:150px;cursor:pointer; transition:all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); position:relative; }
-.film-card-h:hover{transform:translateY(-8px); z-index:2;}
+.film-card-h{ flex-shrink:0;width:150px;cursor:pointer; transition:transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1); position:relative; }
+.film-card-h:hover{transform:translateY(-6px); z-index:2;}
 .film-poster{
   width:150px; aspect-ratio:2/3; border-radius:16px; background:rgba(0,0,0,0.2);
   overflow:hidden;position:relative; border:1px solid var(--border);
@@ -353,6 +398,7 @@ body.modal-open { overflow: hidden !important; touch-action: none; }
 .lib-card-swipe-wrap {
   position: relative; overflow: hidden; border-radius: 16px;
   border: 1px solid var(--border);
+  contain: layout style paint;
 }
 .lib-card-swipe-actions {
   position: absolute; top: 0; right: 0; bottom: 0;
@@ -375,18 +421,19 @@ body.modal-open { overflow: hidden !important; touch-action: none; }
 .lib-card-inner {
   position: relative; z-index: 1;
   transform: translateX(0);
-  transition: transform 0.28s cubic-bezier(0.2,0.8,0.2,1);
+  transition: transform 0.24s cubic-bezier(0.2,0.8,0.2,1);
   background: var(--card2);
   border-radius: 15px;
+  will-change: transform;
 }
 .lib-card-swipe-wrap.swiped .lib-card-inner {
   transform: translateX(-120px);
 }
-.lib-card{ border-radius:16px;overflow:hidden;cursor:pointer; transition:all 0.3s; position:relative; background:#0a0a0e; border:1px solid var(--border); display:flex; flex-direction:column;
+.lib-card{ border-radius:16px;overflow:hidden;cursor:pointer; transition:border-color 0.2s; position:relative; background:#0a0a0e; border:1px solid var(--border); display:flex; flex-direction:column;
   -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
 .lib-card img { -webkit-touch-callout:none; pointer-events:none; user-select:none; }
 .lib-card:hover{border-color:var(--text3);transform:translateY(-4px); box-shadow:0 12px 25px rgba(0,0,0,0.3);}
-.lib-poster{width:100%;aspect-ratio:2/3;background:rgba(0,0,0,0.2);position:relative;overflow:hidden;flex:0 0 auto;}
+.lib-poster{width:100%;aspect-ratio:2/3;background:rgba(0,0,0,0.2);position:relative;overflow:hidden;flex:0 0 auto;content-visibility:auto;contain-intrinsic-size:auto 200px;}
 .lib-poster img{width:100%;height:100%;object-fit:cover;display:block;}
 .lib-poster::after {
   content:'';
@@ -493,8 +540,8 @@ body.modal-open { overflow: hidden !important; touch-action: none; }
 .modal-sheet {
   width: 100%; max-height: 92vh; 
   background: rgba(10, 10, 16, 0.68);
-  backdrop-filter: blur(70px) saturate(200%) brightness(1.08);
-  -webkit-backdrop-filter: blur(70px) saturate(200%) brightness(1.08);
+  backdrop-filter: blur(40px) saturate(180%) brightness(1.08);
+  -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.08);
   border-radius: 32px 32px 0 0;
   overflow-y: auto; padding: 24px 24px 40px; 
   position: relative; z-index: 1;
@@ -513,8 +560,8 @@ body.modal-open { overflow: hidden !important; touch-action: none; }
   background: rgba(248, 248, 252, 0.78); 
   border-top: 1px solid rgba(0,0,0,0.1); 
   box-shadow: 0 -8px 60px rgba(0,0,0,0.12); 
-  backdrop-filter: blur(60px) saturate(180%) brightness(1.05); 
-  -webkit-backdrop-filter: blur(60px) saturate(180%) brightness(1.05);
+  backdrop-filter: blur(40px) saturate(160%) brightness(1.05); 
+  -webkit-backdrop-filter: blur(40px) saturate(160%) brightness(1.05);
 }
 @media(min-width:768px){ .modal-overlay{align-items:center;} .modal-sheet{width:600px; border-radius:24px; max-height:85vh; padding:32px;} }
 .modal-handle{ width:48px;height:5px;background:rgba(255,255,255,0.3); border-radius:3px;margin:0 auto 24px; }
@@ -623,10 +670,10 @@ body.modal-open { overflow: hidden !important; touch-action: none; }
   padding: 30px 26px; width: 100%; max-width: 320px;
   transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.2,0.8,0.2,1);
   box-shadow: 0 30px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.14);
-  backdrop-filter: blur(70px) saturate(200%) brightness(1.1);
-  -webkit-backdrop-filter: blur(70px) saturate(200%) brightness(1.1);
+  backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
+  -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
 }
-[data-theme="light"] .confirm-box { background: rgba(255,255,255,0.82); border-color: rgba(0,0,0,0.12); backdrop-filter: blur(60px) saturate(180%); -webkit-backdrop-filter: blur(60px) saturate(180%); box-shadow: 0 30px 80px rgba(0,0,0,0.15); }
+[data-theme="light"] .confirm-box { background: rgba(255,255,255,0.82); border-color: rgba(0,0,0,0.12); backdrop-filter: blur(40px) saturate(160%); -webkit-backdrop-filter: blur(40px) saturate(160%); box-shadow: 0 30px 80px rgba(0,0,0,0.15); }
 .confirm-title { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; color: var(--text); }
 .confirm-msg { font-size: 0.9rem; color: var(--text2); line-height: 1.5; margin-bottom: 24px; }
 .confirm-actions { display: flex; gap: 12px; }
@@ -691,9 +738,9 @@ body.modal-open { overflow: hidden !important; touch-action: none; }
 .custom-sel-btn.open .sel-arrow { transform: rotate(180deg); }
 .custom-sel-popup {
   position: fixed; z-index: 9500;
-  background: rgba(10,10,16,0.82);
-  backdrop-filter: blur(70px) saturate(200%) brightness(1.1);
-  -webkit-backdrop-filter: blur(70px) saturate(200%) brightness(1.1);
+  background: rgba(10,10,16,0.85);
+  backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
+  -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
   border: 1px solid rgba(255,255,255,0.16);
   border-radius: 20px; overflow: hidden;
   box-shadow: 0 20px 80px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.1);
@@ -995,13 +1042,35 @@ img.w-avatar, .w-avatar {
   transition: left 0.3s;
 }
 .secure-toggle-wrap .toggle-mini.on::after { left:18px; }
+
+/* ============================================================ */
+/* BACK NAVIGATION BUTTONS                                       */
+/* ============================================================ */
+.back-nav-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: transparent; border: none; cursor: pointer;
+  color: var(--text2); font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem; font-weight: 600; padding: 6px 0;
+  transition: color 0.18s;
+  -webkit-tap-highlight-color: transparent;
+}
+.back-nav-btn:active { color: var(--text); }
+.back-nav-btn i { font-size: 1rem; transition: transform 0.18s; }
+.back-nav-btn:active i { transform: translateX(-3px); }
+[data-theme="light"] .back-nav-btn { color: var(--text2); }
 </style>
 </head>
 <body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+// Lazy-load heavy libraries hanya saat dibutuhkan — menghemat ~3MB parse time di startup
+var _h2cLoaded=false,_xlsxLoaded=false,_cropperLoaded=false;
+function _loadScript(src,cb){var s=document.createElement('script');s.src=src;s.onload=cb;document.head.appendChild(s);}
+function _loadStyle(href){if(document.querySelector('link[href="'+href+'"]'))return;var l=document.createElement('link');l.rel='stylesheet';l.href=href;document.head.appendChild(l);}
+function _ensureH2C(cb){if(_h2cLoaded){cb();return;}_loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',function(){_h2cLoaded=true;cb();});}
+function _ensureXLSX(cb){if(_xlsxLoaded){cb();return;}_loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',function(){_xlsxLoaded=true;cb();});}
+function _ensureCropper(cb){if(_cropperLoaded){cb();return;}_loadStyle('https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css');_loadScript('https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js',function(){_cropperLoaded=true;cb();});}
+</script>
 <nav class="top-nav">
   <div class="brand-logo" onclick="navTo('home')">
     <div class="brand-e">E</div>
@@ -1017,10 +1086,9 @@ img.w-avatar, .w-avatar {
     <div class="profile-card glass-card" id="profileCard">
       <div class="profile-top">
         <div class="avatar-wrap">
-          <div class="avatar" id="avatarImgWrap" onclick="document.getElementById('avatarInput').click()">
+          <div class="avatar" id="avatarImgWrap">
             <div class="avatar-placeholder" id="avatarPh"><i class="bi bi-person"></i></div>
           </div>
-          <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="startCropping(this)">
         </div>
         <div class="profile-info">
           <div class="profile-name" id="profileName">Nama Kamu</div>
@@ -1078,6 +1146,12 @@ img.w-avatar, .w-avatar {
     <div class="library-grid" id="libraryGrid"></div>
   </div>
   <div class="page" id="page-history">
+    <!-- Tombol kembali ke Pengaturan (muncul jika dibuka dari Settings) -->
+    <div id="historyBackBtn" style="display:none; padding:16px 20px 0;">
+      <button class="back-nav-btn" onclick="navTo('settings')">
+        <i class="bi bi-arrow-left"></i> Kembali ke Pengaturan
+      </button>
+    </div>
     <div class="section" style="display:flex; justify-content:space-between; align-items:center; padding-bottom:16px;">
         <div class="section-title" style="margin:0;">Histori Aktivitas</div>
         <button class="icon-btn" style="color:var(--red); border-color:var(--red); width:32px; height:32px; font-size:0.9rem;" onclick="clearAllHistory()"><i class="bi bi-trash"></i></button>
@@ -1117,17 +1191,17 @@ img.w-avatar, .w-avatar {
     
     <div class="settings-section-label">Profil</div>
     <div class="settings-item glass-card" style="margin:0 20px 12px; border-radius:16px; border-bottom:1px solid var(--border);" onclick="openEditProfileSafe()">
-      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-person"></i></div><div><div class="settings-label">Edit Profil</div><div class="settings-desc">Ubah nama</div></div></div>
+      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-person"></i></div><div><div class="settings-label">Edit Profil</div></div></div>
       <i class="bi bi-chevron-right settings-arrow"></i>
     </div>
     <div class="settings-section-label">Tampilan</div>
     <div class="settings-item glass-card" style="margin:0 20px 12px; border-radius:16px; border-bottom:1px solid var(--border);" onclick="toggleTheme()">
-      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-moon"></i></div><div><div class="settings-label">Mode Gelap</div><div class="settings-desc">Aktifkan tema gelap</div></div></div>
+      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-moon"></i></div><div><div class="settings-label">Mode Gelap</div></div></div>
       <div class="toggle on" id="themeToggle"></div>
     </div>
     <div class="settings-section-label">Integrasi API</div>
     <div class="settings-item glass-card" style="margin:0 20px 12px;border-radius:16px;border-bottom:1px solid var(--border);" onclick="openTmdbKeyModal()">
-      <div class="settings-item-left"><div class="settings-icon" style="background:rgba(1,180,228,.1);border-color:rgba(1,180,228,.2);"><i class="bi bi-key" style="color:rgba(1,180,228,.85);"></i></div><div><div class="settings-label">TMDb API Key</div><div class="settings-desc" id="tmdbKeyDesc">Belum diatur &mdash; klik untuk setup</div></div></div>
+      <div class="settings-item-left"><div class="settings-icon" style="background:rgba(1,180,228,.1);border-color:rgba(1,180,228,.2);"><i class="bi bi-key" style="color:rgba(1,180,228,.85);"></i></div><div><div class="settings-label">TMDb API Key</div></div></div>
       <i class="bi bi-chevron-right settings-arrow"></i>
     </div>
     <div class="settings-section-label">Privasi</div>
@@ -1140,19 +1214,19 @@ img.w-avatar, .w-avatar {
       <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-hdd"></i></div><div><div class="settings-label">Ukuran Data</div><div class="settings-desc" id="backupSizeDesc">Menghitung...</div></div></div>
     </div>
     <div class="settings-item glass-card" style="margin:0 20px 12px; border-radius:0 0 16px 16px; border-bottom:1px solid var(--border);">
-      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-calendar-check"></i></div><div><div class="settings-label" id="lastBackupDesc">Belum pernah backup</div><div class="settings-desc">Status backup terakhir</div></div></div>
+      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-calendar-check"></i></div><div><div class="settings-label" id="lastBackupDesc">Belum pernah backup</div></div></div>
     </div>
     <div class="settings-item glass-card" style="margin:0 20px 12px; border-radius:16px; border-bottom:1px solid var(--border);" onclick="backupData()">
-      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-cloud-download"></i></div><div><div class="settings-label">Backup Data</div><div class="settings-desc">Pilih format: JSON, CSV, atau Excel</div></div></div>
+      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-cloud-download"></i></div><div><div class="settings-label">Backup Data</div></div></div>
       <i class="bi bi-chevron-right settings-arrow"></i>
     </div>
     <div class="settings-item glass-card" style="margin:0 20px 12px; border-radius:16px; border-bottom:1px solid var(--border);" onclick="document.getElementById('restoreInput').click()">
-      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-cloud-upload"></i></div><div><div class="settings-label">Restore Data</div><div class="settings-desc">Pulihkan koleksi dari file backup .json</div></div></div>
+      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-cloud-upload"></i></div><div><div class="settings-label">Restore Data</div></div></div>
       <i class="bi bi-chevron-right settings-arrow"></i>
     </div>
     <input type="file" id="restoreInput" accept=".json" style="display:none" onchange="restoreData(this)">
     <div class="settings-item glass-card" style="margin:0 20px 12px; border-radius:16px; border-bottom:1px solid var(--border);">
-      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-bell-fill"></i></div><div><div class="settings-label">Pengingat Backup</div><div class="settings-desc">Pengingat backup otomatis</div></div></div>
+      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-bell-fill"></i></div><div><div class="settings-label">Pengingat Backup</div></div></div>
       <select id="autoBackupDaysSelect" style="display:none;" onchange="setAutoBackupDays(this.value)">
         <option value="0">Mati</option>
         <option value="3">3H</option>
@@ -1175,7 +1249,7 @@ img.w-avatar, .w-avatar {
       </div>
     </div>
     <div class="settings-item glass-card" style="margin:0 20px 12px; border-radius:16px; border-bottom:1px solid var(--border);">
-      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-trash3-fill"></i></div><div><div class="settings-label">Histori Maksimal</div><div class="settings-desc">History lama dihapus otomatis</div></div></div>
+      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-trash3-fill"></i></div><div><div class="settings-label">Histori Maksimal</div></div></div>
       <select id="historyMaxMonthsSelect" style="display:none;" onchange="setHistoryMaxMonths(this.value)">
         <option value="0">Tdk</option>
         <option value="1">1B</option>
@@ -1203,7 +1277,7 @@ img.w-avatar, .w-avatar {
       <i class="bi bi-chevron-right settings-arrow"></i>
     </div>
     <div class="settings-item glass-card" style="margin:0 20px 12px; border-radius:16px; border-bottom:1px solid var(--border);" onclick="openWrapped()">
-      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-magic"></i></div><div><div class="settings-label">Buat Wrapped</div><div class="settings-desc">Cetak poster Elevens Wrapped</div></div></div>
+      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-magic"></i></div><div><div class="settings-label">Buat Wrapped</div></div></div>
       <i class="bi bi-chevron-right settings-arrow"></i>
     </div>
     <div style="padding:30px 20px 70px;text-align:center;font-size:0.7rem;color:var(--text3);">Elevens Ultimate Edition<br>Private Tracker App</div>
@@ -1331,7 +1405,7 @@ img.w-avatar, .w-avatar {
     <button class="btn-primary" onclick="closeModal('infoModal')">Saya Mengerti</button>
   </div>
 </div>
-<div class="modal-overlay" id="cropModal">
+<div class="modal-overlay" id="cropModal" style="z-index:210;">
   <div class="modal-sheet swipe-sheet">
     <div class="modal-handle"></div>
     <div class="modal-title">Sesuaikan Foto</div>
@@ -1408,6 +1482,12 @@ img.w-avatar, .w-avatar {
     <div class="modal-close-btn" onclick="closeModal('filmModal', event)"><i class="bi bi-x-lg"></i></div>
     <div class="modal-title" id="filmModalTitle">Tambah Movie/Series</div>
     <div id="tmdbQuickSection" style="display:none;">
+      <!-- Tombol kembali ke hasil pencarian -->
+      <div id="tmdbBackToSearchBtn" style="display:none; margin-bottom:8px;">
+        <button class="back-nav-btn" onclick="_backToTmdbSearch()">
+          <i class="bi bi-arrow-left"></i> Kembali ke Pencarian
+        </button>
+      </div>
       <div class="tmdb-source-badge" style="justify-content:center;padding:12px 16px;">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 66" style="height:14px;display:block;">
   <defs><linearGradient id="tLG2" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -1467,6 +1547,12 @@ img.w-avatar, .w-avatar {
       <button class="btn-secondary" onclick="switchToFullForm()" style="margin-top:0;padding:12px;font-size:.82rem;color:var(--text3);"><i class="bi bi-sliders"></i> Edit Detail Lengkap</button>
     </div>
     <div id="filmFullFormSection">
+    <!-- Tombol kembali ke quick form (hanya tampil jika dari TMDB) -->
+    <div id="tmdbFullFormBackBtn" style="display:none; margin-bottom:4px;">
+      <button class="back-nav-btn" onclick="_backToQuickForm()">
+        <i class="bi bi-arrow-left"></i> Kembali ke Preview
+      </button>
+    </div>
     <div class="form-group">
       <label class="form-label">Poster Movie/Series</label>
       <div class="poster-upload-area" onclick="document.getElementById('posterInput').click()">
@@ -1981,7 +2067,22 @@ img.w-avatar, .w-avatar {
   <div class="modal-sheet swipe-sheet">
     <div class="modal-handle"></div><div class="modal-close-btn" onclick="closeModal('profileModal', event)"><i class="bi bi-x-lg"></i></div>
     <div class="modal-title">Edit Profil</div>
-    <div class="form-group"><label class="form-label">Nama</label><input class="form-input" id="editName"></div>
+    <div class="profile-modal-avatar-wrap" onclick="document.getElementById('avatarInput').click()">
+      <div class="profile-modal-avatar" id="profileModalAvatarWrap">
+        <div class="avatar-placeholder" id="profileModalAvatarPh"><i class="bi bi-person"></i></div>
+      </div>
+      <div class="profile-modal-pencil-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 21L3.8 17.4L17.4 3.8C17.97 3.23 18.93 3.23 19.5 3.8L20.2 4.5C20.77 5.07 20.77 6.03 20.2 6.6L6.6 20.2L3 21Z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M15.5 5.7L18.3 8.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="startCropping(this)">
+    </div>
+    <div class="profile-modal-name-wrap">
+      <input class="profile-modal-name-input" id="editName" placeholder="Nama Kamu">
+      <i class="bi bi-pencil-fill"></i>
+    </div>
     <button class="btn-primary" onclick="saveProfile()">Simpan</button>
   </div>
 </div>
@@ -1989,17 +2090,16 @@ img.w-avatar, .w-avatar {
   <div class="modal-sheet swipe-sheet">
     <div class="modal-handle"></div><div class="modal-close-btn" onclick="closeModal('backupFormatModal', event)"><i class="bi bi-x-lg"></i></div>
     <div class="modal-title">Pilih Format Backup</div>
-    <div style="font-size:0.8rem;color:var(--text2);margin:-8px 0 18px;line-height:1.5;">Pilih format file untuk menyimpan koleksimu.</div>
     <div class="settings-item glass-card" style="margin:0 0 12px; border-radius:16px;" onclick="downloadBackupJSON()">
-      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-filetype-json"></i></div><div><div class="settings-label">File JSON</div><div class="settings-desc">Lengkap & bisa di-restore kembali ke app</div></div></div>
+      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-filetype-json"></i></div><div><div class="settings-label">File JSON</div><div class="settings-desc">Lengkap & bisa direstore kembali ke app</div></div></div>
       <i class="bi bi-chevron-right settings-arrow"></i>
     </div>
     <div class="settings-item glass-card" style="margin:0 0 12px; border-radius:16px;" onclick="downloadBackupExcel()">
-      <div class="settings-item-left"><div class="settings-icon" style="background:rgba(33,150,83,.1);border-color:rgba(33,150,83,.25);"><i class="bi bi-file-earmark-excel" style="color:#21a366;"></i></div><div><div class="settings-label">File Excel (.xlsx)</div><div class="settings-desc">Tabel rapi: 1 film = 1 baris, siap dibuka di Excel/Sheets</div></div></div>
+      <div class="settings-item-left"><div class="settings-icon" style="background:rgba(33,150,83,.1);border-color:rgba(33,150,83,.25);"><i class="bi bi-file-earmark-excel" style="color:#21a366;"></i></div><div><div class="settings-label">File Excel (.xlsx)</div></div></div>
       <i class="bi bi-chevron-right settings-arrow"></i>
     </div>
     <div class="settings-item glass-card" style="margin:0; border-radius:16px; border-bottom:none;" onclick="downloadBackupCSV()">
-      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-filetype-csv"></i></div><div><div class="settings-label">File CSV</div><div class="settings-desc">Format ringan, juga bisa dibuka di Excel/Sheets</div></div></div>
+      <div class="settings-item-left"><div class="settings-icon"><i class="bi bi-filetype-csv"></i></div><div><div class="settings-label">File CSV</div></div></div>
       <i class="bi bi-chevron-right settings-arrow"></i>
     </div>
     <div style="font-size:0.7rem;color:var(--text3);margin-top:16px;line-height:1.5;"><i class="bi bi-info-circle"></i> Catatan: format Excel & CSV hanya untuk dilihat/dibagikan (tidak bisa di-restore ke app). Untuk cadangan yang bisa dipulihkan, gunakan format JSON.</div>
@@ -2041,7 +2141,7 @@ let DB = { profile: { name: 'Nama Kamu', avatar: '' }, films: [], progress: [], 
 let editingFilmId = null; let homeGenreFilter = 'all'; let libGenreFilter = 'all'; let libSearch = ''; let libSortBy = 'rating_desc'; let libMoodFilter = 'all'; let libCountryFilter = 'all'; let libAgeFilter = 'all'; let homeCountersAnimated = false;
 let bulkMode = false; let bulkSelected = new Set();
 let detailFilmId = null; let updateProgId = null; let transferWlId = null; let transferProgId = null; let currentHistoryViewId = null;
-let cropperInstance = null; let currentPage = 'home'; let currentWrappedTheme = 'dark';
+let cropperInstance = null; let currentPage = 'home'; let _prevPage = null; let currentWrappedTheme = 'dark';
 let isStartingFromWatchlist = false; let startingWatchlistLink = '';
 // Array untuk menyimpan urutan pemilihan genre secara dinamis
 let currentSelectedGenres = [];
@@ -2500,6 +2600,7 @@ function navTo(page) {
     const bar = document.getElementById('bulkActionBar');
     if (bar) bar.style.display = 'none';
   }
+  _prevPage = currentPage;
   currentPage = page; try { sessionStorage.setItem('elevens_page', page); } catch(e) {}
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
@@ -2572,6 +2673,14 @@ function closeModal(id, e) {
     if(e) { e.preventDefault(); e.stopPropagation(); } 
     const overlay = document.getElementById(id);
     if (overlay) overlay.classList.remove('show');
+    // Jika filmModal ditutup, reset state back buttons
+    if (id === 'filmModal') {
+      const fb = document.getElementById('tmdbFullFormBackBtn');
+      if (fb) fb.style.display = 'none';
+      const qb = document.getElementById('tmdbBackToSearchBtn');
+      if (qb) qb.style.display = 'none';
+      _fromQuickForm = false;
+    }
     // Unlock body scroll only if no more modals open
     setTimeout(() => {
         const anyOpen = document.querySelectorAll('.modal-overlay.show').length > 0;
@@ -2731,7 +2840,7 @@ function renderHome() {
   } catch(e) { console.error("Error Home Render:", e); }
 }
 function filmCardH(f, rank) {
-  const posterHtml = f.poster ? `<img src="${f.poster}" loading="lazy">` : `<div class="film-poster-placeholder"><i class="bi bi-film"></i></div>`;
+  const posterHtml = f.poster ? `<img src="${f.poster}" loading="lazy" decoding="async">` : `<div class="film-poster-placeholder"><i class="bi bi-film"></i></div>`;
   const rankBadge = rank ? `<div class="poster-rank">#${rank}</div>` : '';
   const isNew = (f.addedAt||0) > Date.now() - (7 * 86400000) && !rank;
   const specialBadge = f.rating === 10 ? `<div class="badge-special">Masterpiece</div>` : '';
@@ -2755,7 +2864,8 @@ function renderGenrePills() {
     });
   });
 }
-function searchLibrary(val) { libSearch = val; renderLibrary(); }
+var _libSearchTimer = null;
+function searchLibrary(val) { libSearch = val; clearTimeout(_libSearchTimer); _libSearchTimer = setTimeout(function(){ renderLibrary(); }, 180); }
 function selectSortItem(el) {
   document.querySelectorAll('#sortRadioGroup .custom-radio-item').forEach(i => i.classList.remove('active'));
   el.classList.add('active');
@@ -2965,87 +3075,141 @@ function showLibrarySkeleton() {
     return '<div class="skeleton-lib-card"><div class="skeleton skeleton-lib-poster"></div><div class="skeleton-lib-info"><div class="skeleton" style="height:12px;border-radius:6px;margin-bottom:6px;width:75%;"></div><div class="skeleton" style="height:10px;border-radius:6px;width:50%;"></div></div></div>';
   }).join('');
 }
+// ============================================================
+// LIBRARY CHUNKED RENDER — renders in batches to stay smooth
+// ============================================================
+var _libChunkSize = 30;
+var _libRenderedCount = 0;
+var _libFilmsCache = [];
+var _libSentinelObs = null;
+
+function _buildLibCardHTML(f) {
+  var ageBadgeLib = f.ageRating ? '<div class="poster-age-badge">'+f.ageRating+'</div>' : '';
+  var rewatchBadge = f.rewatch > 0 ? '<div style="position:absolute;bottom:10px;left:10px;background:rgba(245,158,11,0.85);color:#fff;border-radius:6px;padding:2px 6px;font-size:0.6rem;font-weight:800;">x'+f.rewatch+'</div>' : '';
+  var cAbbr = f.countryAbbr || (f.country ? getCountryAbbr(f.country) : '');
+  var countryBadgeLib = cAbbr ? '<div class="lib-country-badge">'+cAbbr+'</div>' : '';
+  if (bulkMode) {
+    var isSelected = bulkSelected.has(f.id);
+    return '<div class="lib-card" style="'+(isSelected?'border-color:var(--red);box-shadow:0 0 0 2px rgba(216,0,12,0.4);':'')+'" onclick="toggleBulkSelect(\''+f.id+'\')">'
+      +'<div class="lib-poster" style="position:relative;">'+(f.poster?'<img src="'+f.poster+'" loading="lazy" decoding="async">':'<div style="display:flex;height:100%;align-items:center;justify-content:center;color:var(--text3);font-size:2rem;"><i class="bi bi-film"></i></div>')+ageBadgeLib
+      +'<div style="position:absolute;top:8px;left:8px;width:22px;height:22px;border-radius:50%;background:'+(isSelected?'var(--red)':'rgba(0,0,0,0.6)')+';border:2px solid '+(isSelected?'var(--red)':'rgba(255,255,255,0.5)')+';display:flex;align-items:center;justify-content:center;">'
+      +(isSelected?'<i class="bi bi-check" style="color:#fff;font-size:0.75rem;"></i>':'')+'</div></div>'
+      +'<div class="lib-info"><div class="lib-title">'+escapeHtml(f.title)+'</div><div class="lib-meta"><div class="lib-rating"><i class="bi bi-star-fill"></i> '+(f.rating||0)+'/10</div><div class="lib-genre">'+escapeHtml((f.genres||[])[0]||'')+'</div></div></div>'
+      +'</div>';
+  }
+  return '<div class="lib-card-swipe-wrap">'
+    +'<div class="lib-card-swipe-actions">'
+    +'<div class="lib-swipe-btn lib-swipe-btn-edit" onclick="event.stopPropagation();openEditFilm(\''+f.id+'\')"><i class="bi bi-pencil"></i>Edit</div>'
+    +'<div class="lib-swipe-btn lib-swipe-btn-del" onclick="event.stopPropagation();_swipeDeleteFilm(\''+f.id+'\')"><i class="bi bi-trash"></i>Hapus</div>'
+    +'</div>'
+    +'<div class="lib-card-inner"><div class="lib-card" onclick="if(!_lpFired)openDetail(\''+f.id+'\')" oncontextmenu="return false" ontouchstart="libLongPressStart(event,\''+f.id+'\')" ontouchmove="libLongPressMove(event)" ontouchend="libLongPressEnd(event)" onmousedown="libLongPressStart(event,\''+f.id+'\')" onmouseup="libLongPressEnd(event)" onmousemove="libLongPressMove(event)">'
+    +'<div class="lib-poster" style="position:relative;">'+(f.poster?'<img src="'+f.poster+'" loading="lazy" decoding="async" draggable="false">':'<div style="display:flex;height:100%;align-items:center;justify-content:center;color:var(--text3);font-size:2rem;"><i class="bi bi-film"></i></div>')+ageBadgeLib+rewatchBadge+countryBadgeLib+'</div>'
+    +'<div class="lib-info"><div class="lib-title">'+escapeHtml(f.title)+'</div><div class="lib-meta"><div class="lib-rating"><i class="bi bi-star-fill"></i> '+(f.rating||0)+'/10</div><div class="lib-genre">'+escapeHtml((f.genres||[])[0]||'')+'</div></div></div>'
+    +'</div></div></div>';
+}
+
+function _libAppendChunk(grid) {
+  var start = _libRenderedCount;
+  var end = Math.min(start + _libChunkSize, _libFilmsCache.length);
+  if (start >= _libFilmsCache.length) return;
+  var frag = document.createDocumentFragment();
+  var tmp = document.createElement('div');
+  var html = '';
+  for (var i = start; i < end; i++) { html += _buildLibCardHTML(_libFilmsCache[i]); }
+  tmp.innerHTML = html;
+  while (tmp.firstChild) frag.appendChild(tmp.firstChild);
+  // Remove old sentinel before appending
+  var oldSentinel = grid.querySelector('.lib-sentinel');
+  if (oldSentinel) oldSentinel.remove();
+  grid.appendChild(frag);
+  _libRenderedCount = end;
+  // Re-init swipes only on newly added cards
+  var wraps = grid.querySelectorAll('.lib-card-swipe-wrap');
+  for (var j = start; j < Math.min(end, wraps.length); j++) { _initCardSwipe(wraps[j]); }
+  // Add sentinel if more remain
+  if (_libRenderedCount < _libFilmsCache.length) {
+    var sentinel = document.createElement('div');
+    sentinel.className = 'lib-sentinel';
+    sentinel.style.cssText = 'height:1px;grid-column:1/-1;';
+    grid.appendChild(sentinel);
+    if (_libSentinelObs) _libSentinelObs.observe(sentinel);
+  }
+}
+
+function _initLibSentinelObserver(grid) {
+  if (_libSentinelObs) _libSentinelObs.disconnect();
+  _libSentinelObs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) { _libAppendChunk(grid); }
+    });
+  }, { rootMargin: '200px' });
+}
+
 function renderLibrary() {
   try {
-      let films = Array.isArray(DB.films) ? DB.films.slice() : [];
+      var films = Array.isArray(DB.films) ? DB.films.slice() : [];
       
       // Filter Logic
-      if (libGenreFilter !== 'all') films = films.filter(f => (f.genres||[]).includes(libGenreFilter)); 
-      if (libMoodFilter !== 'all') films = films.filter(f => f.mood === libMoodFilter);
-      if (libCountryFilter !== 'all') films = films.filter(f => (f.country || '') === libCountryFilter);
-      if (libAgeFilter !== 'all') films = films.filter(f => (f.ageRating || '') === libAgeFilter);
-      if (libSearch) films = films.filter(f => f.title.toLowerCase().includes(libSearch.toLowerCase()));
+      if (libGenreFilter !== 'all') films = films.filter(function(f){ return (f.genres||[]).includes(libGenreFilter); }); 
+      if (libMoodFilter !== 'all') films = films.filter(function(f){ return f.mood === libMoodFilter; });
+      if (libCountryFilter !== 'all') films = films.filter(function(f){ return (f.country || '') === libCountryFilter; });
+      if (libAgeFilter !== 'all') films = films.filter(function(f){ return (f.ageRating || '') === libAgeFilter; });
+      if (libSearch) films = films.filter(function(f){ return f.title.toLowerCase().includes(libSearch.toLowerCase()); });
 
       // Filter button indicator
-      const filterBtn = document.getElementById('filterBtn');
-      const hasActiveFilter = libCountryFilter !== 'all' || libAgeFilter !== 'all' || libSortBy !== 'rating_desc';
+      var filterBtn = document.getElementById('filterBtn');
+      var hasActiveFilter = libCountryFilter !== 'all' || libAgeFilter !== 'all' || libSortBy !== 'rating_desc';
       if (filterBtn) { filterBtn.style.borderColor = hasActiveFilter ? 'var(--red)' : ''; filterBtn.style.color = hasActiveFilter ? 'var(--red)' : ''; }
 
       // Render mood filter pills
-      const moodScroll = document.getElementById('libMoodScroll');
+      var moodScroll = document.getElementById('libMoodScroll');
       if (moodScroll) {
-        const moods = [...new Set((DB.films||[]).map(f=>f.mood).filter(Boolean))];
+        var moods = [...new Set((DB.films||[]).map(function(f){return f.mood;}).filter(Boolean))];
         if (moods.length > 0) {
           moodScroll.style.display = 'flex';
-          const allActive = libMoodFilter === 'all';
-          moodScroll.innerHTML = `<div class="genre-pill${allActive?' active':''}" style="cursor:pointer;" onclick="libMoodFilter='all';renderLibrary();">Semua Mood</div>`
-            + moods.map(m => `<div class="genre-pill${libMoodFilter===m?' active':''}" style="cursor:pointer;" onclick="libMoodFilter='${m}';renderLibrary();">${m}</div>`).join('');
+          var allActive = libMoodFilter === 'all';
+          moodScroll.innerHTML = '<div class="genre-pill'+(allActive?' active':'')+'" style="cursor:pointer;" onclick="libMoodFilter=\'all\';renderLibrary();">Semua Mood</div>'
+            + moods.map(function(m){ return '<div class="genre-pill'+(libMoodFilter===m?' active':'')+'" style="cursor:pointer;" onclick="libMoodFilter=\''+m+'\';renderLibrary();">'+m+'</div>'; }).join('');
         } else {
           moodScroll.style.display = 'none';
         }
       }
       
       // Sorting Logic
-      if (libSortBy === 'newest') films.sort((a,b) => (b.addedAt||0) - (a.addedAt||0));
-      else if (libSortBy === 'oldest') films.sort((a,b) => (a.addedAt||0) - (b.addedAt||0));
-      else if (libSortBy === 'rating_desc') films.sort((a,b) => (b.rating||0) - (a.rating||0));
-      else if (libSortBy === 'rating_asc') films.sort((a,b) => (a.rating||0) - (b.rating||0));
-      else if (libSortBy === 'az') films.sort((a,b) => a.title.localeCompare(b.title));
-      else if (libSortBy === 'za') films.sort((a,b) => b.title.localeCompare(a.title));
-      else if (libSortBy === 'random') { for (let i = films.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [films[i], films[j]] = [films[j], films[i]]; } }
-      else if (libSortBy === 'year_desc') films.sort((a,b) => (parseInt(b.year)||0) - (parseInt(a.year)||0));
-      else if (libSortBy === 'year_asc') films.sort((a,b) => (parseInt(a.year)||0) - (parseInt(b.year)||0));
-      else if (libSortBy === 'duration_desc') films.sort((a,b) => (b.duration||0) - (a.duration||0));
-      else if (libSortBy === 'duration_asc') films.sort((a,b) => (a.duration||0) - (b.duration||0));
+      if (libSortBy === 'newest') films.sort(function(a,b){ return (b.addedAt||0)-(a.addedAt||0); });
+      else if (libSortBy === 'oldest') films.sort(function(a,b){ return (a.addedAt||0)-(b.addedAt||0); });
+      else if (libSortBy === 'rating_desc') films.sort(function(a,b){ return (b.rating||0)-(a.rating||0); });
+      else if (libSortBy === 'rating_asc') films.sort(function(a,b){ return (a.rating||0)-(b.rating||0); });
+      else if (libSortBy === 'az') films.sort(function(a,b){ return a.title.localeCompare(b.title); });
+      else if (libSortBy === 'za') films.sort(function(a,b){ return b.title.localeCompare(a.title); });
+      else if (libSortBy === 'random') { for (var i=films.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1));var t=films[i];films[i]=films[j];films[j]=t; } }
+      else if (libSortBy === 'year_desc') films.sort(function(a,b){ return (parseInt(b.year)||0)-(parseInt(a.year)||0); });
+      else if (libSortBy === 'year_asc') films.sort(function(a,b){ return (parseInt(a.year)||0)-(parseInt(b.year)||0); });
+      else if (libSortBy === 'duration_desc') films.sort(function(a,b){ return (b.duration||0)-(a.duration||0); });
+      else if (libSortBy === 'duration_asc') films.sort(function(a,b){ return (a.duration||0)-(b.duration||0); });
       
-      document.getElementById('libCount').textContent = `${films.length} Movies & Series tercatat`; const grid = document.getElementById('libraryGrid');
+      document.getElementById('libCount').textContent = films.length + ' Movies & Series tercatat';
+      var grid = document.getElementById('libraryGrid');
+      
       if (films.length === 0) {
-        const isFiltered = libGenreFilter !== 'all' || libMoodFilter !== 'all' || libCountryFilter !== 'all' || libAgeFilter !== 'all' || libSearch;
+        if (_libSentinelObs) _libSentinelObs.disconnect();
+        var isFiltered = libGenreFilter !== 'all' || libMoodFilter !== 'all' || libCountryFilter !== 'all' || libAgeFilter !== 'all' || libSearch;
         if (isFiltered) {
           grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="bi bi-funnel empty-icon"></i><div class="empty-text">Tidak ada film yang cocok dengan filter.</div><div onclick="resetLibraryFilter()" style="margin-top:14px;padding:10px 22px;border-radius:12px;background:var(--red);color:#fff;font-size:0.82rem;font-weight:700;cursor:pointer;display:inline-block;">Reset Filter</div></div>';
         } else {
           grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="bi bi-film empty-icon" style="font-size:3rem;margin-bottom:12px;"></i><div class="empty-text" style="margin-bottom:6px;">Lemari masih kosong.</div><div style="font-size:0.78rem;color:var(--text3);margin-bottom:16px;">Mulai catat tontonan pertamamu!</div><div onclick="openAddFilm()" style="padding:12px 28px;border-radius:14px;background:var(--red);color:#fff;font-size:0.88rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 14px var(--red-glow);"> Tambah Film Pertamamu</div></div>';
         }
         return;
-
       }
-      grid.innerHTML = films.map(f => {
-        const ageBadgeLib = f.ageRating ? `<div class="poster-age-badge">${f.ageRating}</div>` : '';
-        const rewatchBadge = f.rewatch > 0 ? `<div style="position:absolute;bottom:10px;left:10px;background:rgba(245,158,11,0.85);color:#fff;border-radius:6px;padding:2px 6px;font-size:0.6rem;font-weight:800;">x${f.rewatch}</div>` : '';
-        const cAbbr = f.countryAbbr || (f.country ? getCountryAbbr(f.country) : '');
-        const countryBadgeLib = cAbbr ? `<div class="lib-country-badge">${cAbbr}</div>` : '';
-        if (bulkMode) {
-          const isSelected = bulkSelected.has(f.id);
-          return `<div class="lib-card" style="${isSelected ? 'border-color:var(--red);box-shadow:0 0 0 2px rgba(216,0,12,0.4);' : ''}" onclick="toggleBulkSelect('${f.id}')">
-            <div class="lib-poster" style="position:relative;">${f.poster ? `<img src="${f.poster}" loading="lazy">` : '<div style="display:flex;height:100%;align-items:center;justify-content:center;color:var(--text3);font-size:2rem;"><i class="bi bi-film"></i></div>'}${ageBadgeLib}
-              <div style="position:absolute;top:8px;left:8px;width:22px;height:22px;border-radius:50%;background:${isSelected?'var(--red)':'rgba(0,0,0,0.6)'};border:2px solid ${isSelected?'var(--red)':'rgba(255,255,255,0.5)'};display:flex;align-items:center;justify-content:center;">
-                ${isSelected ? '<i class="bi bi-check" style="color:#fff;font-size:0.75rem;"></i>' : ''}
-              </div>
-            </div>
-            <div class="lib-info"><div class="lib-title">${escapeHtml(f.title)}</div><div class="lib-meta"><div class="lib-rating"><i class="bi bi-star-fill"></i> ${f.rating||0}/10</div><div class="lib-genre">${escapeHtml((f.genres||[])[0]||'')}</div></div></div>
-          </div>`;
-        }
-        return `<div class="lib-card-swipe-wrap">
-          <div class="lib-card-swipe-actions">
-            <div class="lib-swipe-btn lib-swipe-btn-edit" onclick="event.stopPropagation();openEditFilm('${f.id}')"><i class="bi bi-pencil"></i>Edit</div>
-            <div class="lib-swipe-btn lib-swipe-btn-del" onclick="event.stopPropagation();_swipeDeleteFilm('${f.id}')"><i class="bi bi-trash"></i>Hapus</div>
-          </div>
-          <div class="lib-card-inner"><div class="lib-card" onclick="if(!_lpFired)openDetail('${f.id}')" oncontextmenu="return false" ontouchstart="libLongPressStart(event,'${f.id}')" ontouchmove="libLongPressMove(event)" ontouchend="libLongPressEnd(event)" onmousedown="libLongPressStart(event,'${f.id}')" onmouseup="libLongPressEnd(event)" onmousemove="libLongPressMove(event)"><div class="lib-poster" style="position:relative;">${f.poster ? `<img src="${f.poster}" loading="lazy" draggable="false">` : '<div style="display:flex;height:100%;align-items:center;justify-content:center;color:var(--text3);font-size:2rem;"><i class="bi bi-film"></i></div>'}${ageBadgeLib}${rewatchBadge}${countryBadgeLib}</div><div class="lib-info"><div class="lib-title">${escapeHtml(f.title)}</div><div class="lib-meta"><div class="lib-rating"><i class="bi bi-star-fill"></i> ${f.rating||0}/10</div><div class="lib-genre">${escapeHtml((f.genres||[])[0]||'')}</div></div></div></div></div>
-        </div>`;
-      }).join('');
+
+      // Chunked rendering
+      _libFilmsCache = films;
+      _libRenderedCount = 0;
+      grid.innerHTML = '';
+      _initLibSentinelObserver(grid);
+      _libAppendChunk(grid);
+
   } catch(e) { console.error("Error Library Render:", e); }
-  // Init swipe gestures after render
-  setTimeout(_initAllCardSwipes, 60);
 }
 function renderStats() {
   const el = document.getElementById('statsContent');
@@ -3114,27 +3278,27 @@ function renderStats() {
   el.innerHTML = `
     <!-- Summary cards -->
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">
-      <div class="glass-card" style="padding:0;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;height:72px;">
+      <div class="glass-card" onclick="openStatsCardInfo('total')" style="padding:0;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;height:72px;cursor:pointer;-webkit-tap-highlight-color:transparent;">
         <div id="statsCardTotal" style="font-size:1.15rem;font-weight:800;color:var(--text);line-height:1;">0</div>
         <div style="font-size:0.58rem;color:var(--text3);margin-top:5px;">Total Shows</div>
       </div>
-      <div class="glass-card" style="padding:0;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;height:72px;">
+      <div class="glass-card" onclick="openStatsCardInfo('watchTime')" style="padding:0;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;height:72px;cursor:pointer;-webkit-tap-highlight-color:transparent;">
         <div id="statsCardWatchTime" style="font-size:0.88rem;font-weight:800;color:var(--text);line-height:1;">0j 0m</div>
         <div style="font-size:0.58rem;color:var(--text3);margin-top:5px;">Watch Time</div>
       </div>
-      <div class="glass-card" style="padding:0;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;height:72px;">
+      <div class="glass-card" onclick="openStatsCardInfo('avg')" style="padding:0;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;height:72px;cursor:pointer;-webkit-tap-highlight-color:transparent;">
         <div id="statsCardAvg" style="font-size:1.15rem;font-weight:800;color:var(--gold2);line-height:1;">0</div>
         <div style="font-size:0.58rem;color:var(--text3);margin-top:5px;">Avg Rating</div>
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
-      <div class="glass-card" style="padding:12px;border-radius:14px;text-align:center;">
+      <div class="glass-card" onclick="openStatsCardInfo('movies')" style="padding:12px;border-radius:14px;text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent;">
         <div id="statsCardMovies" style="font-size:1.3rem;font-weight:800;color:var(--text);">0</div>
         <div style="font-size:0.6rem;color:var(--text3);">Movie</div>
       </div>
-      <div class="glass-card" style="padding:12px;border-radius:14px;text-align:center;">
+      <div class="glass-card" onclick="openStatsCardInfo('series')" style="padding:12px;border-radius:14px;text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent;">
         <div id="statsCardSeries" style="font-size:1.3rem;font-weight:800;color:var(--text);">0</div>
-        <div style="font-size:0.6rem;color:var(--text3);">Series & Anime</div>
+        <div style="font-size:0.6rem;color:var(--text3);">Series / Anime</div>
       </div>
     </div>
 
@@ -3267,6 +3431,9 @@ function renderStats() {
   }, 80);
 }
 function renderHistory() {
+  // Tampilkan tombol kembali jika history dibuka dari Settings
+  var hBackBtn = document.getElementById('historyBackBtn');
+  if (hBackBtn) hBackBtn.style.display = (_prevPage === 'settings') ? 'block' : 'none';
   try {
       const el = document.getElementById('historyList'); if (!Array.isArray(DB.history) || DB.history.length === 0) { el.innerHTML = '<div class="empty-state"><i class="bi bi-clock-history empty-icon"></i><div class="empty-text">Belum ada aktivitas.</div></div>'; return; }
       const typeLabel = { add_film: 'Show Ditambahkan', edit_film: 'Show Diedit', delete_film: 'Show Dihapus', progress_add: 'Progres Dimulai', progress_update: 'Progres Diperbarui', progress_done: 'Selesai Ditonton', delete_prog: 'Progres Dihapus', watchlist_add: 'Watchlist Ditambah', edit_wl: 'Watchlist Diedit', delete_wl: 'Watchlist Dihapus', add: 'Ditambahkan', edit: 'Diedit', delete: 'Dihapus' };
@@ -3342,9 +3509,9 @@ function execUndoHistory() {
         console.error(e); toast('Gagal melakukan Undo data.');
     }
 }
-function startCropping(input) { const file = input.files[0]; if (!file) return; compressImage(file, (dataUrl) => { const cropModal = document.getElementById('cropModal'); const cropImage = document.getElementById('cropImage'); cropImage.src = dataUrl; openModal('cropModal'); if (cropperInstance) cropperInstance.destroy(); cropperInstance = new Cropper(cropImage, { aspectRatio: 1, viewMode: 1, autoCropArea: 0.8, responsive: true, guides: false, center: true, highlight: false, cropBoxMovable: true, cropBoxResizable: true, toggleDragModeOnDblclick: false }); }); }
+function startCropping(input) { const file = input.files[0]; if (!file) return; _ensureCropper(function(){ compressImage(file, (dataUrl) => { const cropModal = document.getElementById('cropModal'); const cropImage = document.getElementById('cropImage'); cropImage.src = dataUrl; openModal('cropModal'); if (cropperInstance) cropperInstance.destroy(); cropperInstance = new Cropper(cropImage, { aspectRatio: 1, viewMode: 1, autoCropArea: 0.8, responsive: true, guides: false, center: true, highlight: false, cropBoxMovable: true, cropBoxResizable: true, toggleDragModeOnDblclick: false }); }); }); }
 function cancelCropping() { if (cropperInstance) cropperInstance.destroy(); closeModal('cropModal'); document.getElementById('avatarInput').value = ''; }
-function saveCroppedAvatar() { if (!cropperInstance) return; const canvas = cropperInstance.getCroppedCanvas({ width: 400, height: 400, imageSmoothingEnabled: true, imageSmoothingQuality: 'high' }); DB.profile.avatar = canvas.toDataURL('image/jpeg', 0.8); save(); renderHome(); toast('Foto profil berhasil disesuaikan!'); cropperInstance.destroy(); closeModal('cropModal'); document.getElementById('avatarInput').value = ''; }
+function saveCroppedAvatar() { if (!cropperInstance) return; const canvas = cropperInstance.getCroppedCanvas({ width: 400, height: 400, imageSmoothingEnabled: true, imageSmoothingQuality: 'high' }); DB.profile.avatar = canvas.toDataURL('image/jpeg', 0.8); save(); renderHome(); const wrap = document.getElementById('profileModalAvatarWrap'); const ph = document.getElementById('profileModalAvatarPh'); if (wrap) wrap.style.backgroundImage = `url('${DB.profile.avatar}')`; if (ph) ph.style.display = 'none'; toast('Foto profil berhasil disesuaikan!'); cropperInstance.destroy(); closeModal('cropModal'); document.getElementById('avatarInput').value = ''; }
 function openAddProgressDirect() {
   transferWlId = null;
   isStartingFromWatchlist = false;
@@ -4502,7 +4669,14 @@ function deleteFromDetail() {
     if (currentPage === 'history') renderHistory();
   });
 }
-function openEditProfile() { document.getElementById('editName').value = DB.profile.name; openModal('profileModal'); }
+function openEditProfile() {
+  document.getElementById('editName').value = DB.profile.name;
+  const wrap = document.getElementById('profileModalAvatarWrap');
+  const ph = document.getElementById('profileModalAvatarPh');
+  if (DB.profile.avatar) { wrap.style.backgroundImage = `url('${DB.profile.avatar}')`; ph.style.display = 'none'; }
+  else { wrap.style.backgroundImage = 'none'; ph.style.display = 'flex'; }
+  openModal('profileModal');
+}
 function saveProfile() { DB.profile.name = document.getElementById('editName').value.trim() || 'Nama Kamu'; save(); closeModal('profileModal'); renderHome(); toast('Profil tersimpan!'); }
 function backupData() { openModal('backupFormatModal'); }
 function markBackupDone() {
@@ -4559,6 +4733,7 @@ function downloadBackupCSV() {
   toast('Export CSV berhasil diunduh!');
 }
 function downloadBackupExcel() {
+  _ensureXLSX(function() {
   if (typeof XLSX === 'undefined') { toast('Modul Excel gagal dimuat. Coba lagi atau gunakan format CSV.'); return; }
   const headers = ['No','Judul','Tahun','Tipe','Genre','Negara','Rating Usia','Mood','Durasi (menit)','Episode Ditonton','Rating (0-10)','Sinopsis','Ulasan Pribadi','Ulasan Terkunci','Jumlah Rewatch','Tanggal Ditambahkan'];
   const rows = DB.films.map((f, i) => [
@@ -4596,6 +4771,7 @@ function downloadBackupExcel() {
   markBackupDone();
   closeModal('backupFormatModal');
   toast('Export Excel berhasil diunduh!');
+  }); // end _ensureXLSX
 }
 // Estimasi ukuran data tersimpan saat ini (berdasarkan ukuran string JSON DB), untuk ditampilkan di Settings
 function getBackupSizeEstimate() {
@@ -4691,10 +4867,21 @@ function restoreData(input) {
       }
       if (!fixed.profile.name) fixed.profile.name = 'Nama Kamu';
       DB = fixed;
-      if (typeof localforage !== 'undefined') {
-        await localforage.setItem('elevens_db', structuredClone(DB));
+      const { light, posters } = _dehydrateDB(DB);
+      if (posterStore) {
+        try {
+          // Bersihkan poster lama sebelum tulis yang baru, supaya backup lama tidak menumpuk
+          const oldKeys = await posterStore.keys();
+          await Promise.all(oldKeys.map(k => posterStore.removeItem(k)));
+          _posterMemCache.clear();
+          const ids = Object.keys(posters);
+          await Promise.all(ids.map(pid => posterStore.setItem(pid, posters[pid])));
+        } catch(err) { console.warn('Gagal menyimpan poster restore ke IndexedDB:', err); }
       }
-      try { localStorage.setItem('elevens_db', JSON.stringify(DB)); } catch(err){}
+      if (typeof localforage !== 'undefined') {
+        await localforage.setItem('elevens_db', light);
+      }
+      try { localStorage.setItem('elevens_db', JSON.stringify(light)); } catch(err){}
       toast('Data dipulihkan! Memuat ulang...'); 
       setTimeout(() => location.reload(), 1000); 
     } catch(err) { toast('File tidak valid.'); } 
@@ -4755,6 +4942,63 @@ function openStatInfo(type) {
         val = `Menambahkan ${monthCount} film bulan ini. Top genre: ${topMonthGenre}.`;
         desc = 'Rekapitulasi aktivitas penambahan mahakarya dalam sebulan terakhir untuk melihat fluktuasi dan tren tontonan seleramu saat ini.';
     }
+    document.getElementById('titleModalContent').innerHTML = `
+        ${icon}
+        <div style="font-family:'Cormorant Garamond',serif; font-size: 1.8rem; font-weight: 700; color: var(--text); margin-bottom: 12px;">${title}</div>
+        <div style="font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 8px;">${val}</div>
+        <div style="font-size: 0.9rem; color: var(--text2); line-height: 1.6; font-style: italic;">${desc}</div>
+    `;
+    openModal('titleModal');
+}
+function openStatsCardInfo(type) {
+    const films = Array.isArray(DB.films) ? DB.films : [];
+    const totalFilms = films.length;
+    let icon = '', title = '', val = '', desc = '';
+
+    if (type === 'total') {
+        const movies = films.filter(f => f.type === 'movie' || !f.type).length;
+        const series = films.filter(f => f.type === 'series' || f.type === 'anime').length;
+        icon = '<i class="bi bi-collection-fill" style="font-size: 3rem; color: var(--text); margin-bottom: 16px; display: block;"></i>';
+        title = 'Total Shows';
+        val = `Kamu memiliki ${totalFilms} karya di koleksimu.`;
+        desc = `Terdiri dari ${movies} film dan ${series} series/anime yang telah kamu catat dalam Elevens.`;
+    }
+    else if (type === 'watchTime') {
+        const mins = calculateTotalMinsRaw();
+        const d = Math.floor(mins / 1440);
+        const h = Math.floor((mins % 1440) / 60);
+        const m = Math.floor(mins % 60);
+        icon = '<i class="bi bi-clock-history" style="font-size: 3rem; color: var(--text); margin-bottom: 16px; display: block;"></i>';
+        title = 'Total Waktu Nonton';
+        val = `Kamu telah menonton kira-kira selama ${d} hari, ${h} jam, ${m} menit.`;
+        desc = 'Dihitung dari: durasi film di Lemari + (rata-rata durasi per eps × eps selesai) untuk series + menit posisi episode yang sedang ditonton.';
+    }
+    else if (type === 'avg') {
+        const avg = totalFilms ? (films.reduce((s,f)=>s+(f.rating||0),0)/totalFilms).toFixed(1) : '0';
+        const rated = films.filter(f => f.rating && f.rating > 0).length;
+        icon = '<i class="bi bi-star-fill" style="font-size: 3rem; color: var(--gold2); margin-bottom: 16px; display: block;"></i>';
+        title = 'Rata-Rata Rating';
+        val = `Rata-rata rating yang kamu berikan adalah ${avg} dari 10.`;
+        desc = `Dari ${rated} karya yang telah diberi rating. Angka ini mencerminkan standar selera dan tingkat kekritisanmu terhadap karya sinematik.`;
+    }
+    else if (type === 'movies') {
+        const movies = films.filter(f => f.type === 'movie' || !f.type);
+        const avgMovieRating = movies.length ? (movies.reduce((s,f)=>s+(f.rating||0),0)/movies.length).toFixed(1) : '0';
+        icon = '<i class="bi bi-film" style="font-size: 3rem; color: var(--text); margin-bottom: 16px; display: block;"></i>';
+        title = 'Total Film';
+        val = `Kamu memiliki ${movies.length} film di koleksimu.`;
+        desc = `Rata-rata rating film: ★ ${avgMovieRating}. Film mendominasi ${Math.round((movies.length/totalFilms)*100)}% dari total koleksimu.`;
+    }
+    else if (type === 'series') {
+        const series = films.filter(f => f.type === 'series' || f.type === 'anime');
+        const avgSeriesRating = series.length ? (series.reduce((s,f)=>s+(f.rating||0),0)/series.length).toFixed(1) : '0';
+        const animes = series.filter(f => f.type === 'anime').length;
+        icon = '<i class="bi bi-tv" style="font-size: 3rem; color: var(--text); margin-bottom: 16px; display: block;"></i>';
+        title = 'Series / Anime';
+        val = `Kamu memiliki ${series.length - animes} series dan ${animes} anime di koleksimu.`;
+        desc = `Rata-rata rating: ★ ${avgSeriesRating}.`;
+    }
+
     document.getElementById('titleModalContent').innerHTML = `
         ${icon}
         <div style="font-family:'Cormorant Garamond',serif; font-size: 1.8rem; font-weight: 700; color: var(--text); margin-bottom: 12px;">${title}</div>
@@ -4891,9 +5135,11 @@ function openWrapped() {
 }
 
 function downloadWrapped() {
-  if (typeof html2canvas === 'undefined') { toast('Sedang memuat library render, coba lagi.'); return; }
   const sourceCard = document.getElementById('wrappedCard');
   if (!sourceCard) { toast('Preview belum siap.'); return; }
+  toast('Memuat render engine...');
+  _ensureH2C(function() {
+  if (typeof html2canvas === 'undefined') { toast('Gagal memuat library render, coba lagi.'); return; }
   toast('Merender poster HD...');
 
   const ghost = document.createElement('div');
@@ -4946,6 +5192,7 @@ function downloadWrapped() {
   };
 
   setTimeout(doRender, 150);
+  }); // end _ensureH2C
 }
 
 // Smooth inertia wheel scroll for horizontal rows & genre scrolls
@@ -5000,13 +5247,13 @@ function downloadWrapped() {
     addSmoothWheelScroll(document.getElementById('recentFilmsRow'));
   });
 })();
-function initApp() {
+async function initApp() {
   let lsVal = null;
   try {
     const lsStr = localStorage.getItem('elevens_db');
     if (lsStr) lsVal = JSON.parse(lsStr);
   } catch(e) { lsVal = null; }
-  const applyData = (val) => {
+  const applyData = async (val) => {
     if (val && typeof val === 'object' && Array.isArray(val.films)) {
       DB = val;
     } else if (lsVal && typeof lsVal === 'object' && Array.isArray(lsVal.films)) {
@@ -5014,6 +5261,19 @@ function initApp() {
     }
     
     if (!DB || typeof DB !== 'object') DB = {};
+    // Isi balik poster (base64) dari IndexedDB ke dalam DB di memori, supaya semua
+    // kode render lama (f.poster, p.poster, dst) tetap berfungsi seperti biasa.
+    if (posterStore) {
+      try {
+        const keys = await posterStore.keys();
+        if (keys.length) {
+          const vals = await Promise.all(keys.map(k => posterStore.getItem(k)));
+          const postersMap = {};
+          keys.forEach((k, i) => { postersMap[k] = vals[i]; _posterMemCache.set(k, vals[i]); });
+          _hydrateDB(DB, postersMap);
+        }
+      } catch(e) { console.warn('Gagal memuat poster dari IndexedDB:', e); }
+    }
     if (!DB.profile) DB.profile = { name: 'Nama Kamu', avatar: '' };
     if (!Array.isArray(DB.films)) DB.films = [];
     if (!Array.isArray(DB.progress)) DB.progress = [];
@@ -5035,7 +5295,8 @@ function initApp() {
       document.getElementById('mainFab').style.display = 'none';
       showLibrarySkeleton();
       renderHome();
-      renderLibrary();
+      // Defer library render after home paint completes — faster initial load
+      requestIdleCallback ? requestIdleCallback(function(){ renderLibrary(); }) : setTimeout(function(){ renderLibrary(); }, 80);
       // Restore halaman terakhir sebelum refresh
       try {
         const savedPage = sessionStorage.getItem('elevens_page');
@@ -5045,6 +5306,11 @@ function initApp() {
         }
       } catch(e) {}
       checkAutoBackupReminder();
+      if (typeof requestIdleCallback === 'function') {
+        requestIdleCallback(() => { pruneOrphanPosters(); });
+      } else {
+        setTimeout(() => { pruneOrphanPosters(); }, 1500);
+      }
     } catch(renderError) {
       console.error("UI Render Failed:", renderError);
     }
@@ -5060,14 +5326,102 @@ function initApp() {
     applyData(lsVal);
   }
 }
-function save() {
-  try { localStorage.setItem('elevens_db', JSON.stringify(DB)); } catch(e) { console.warn('localStorage penuh atau error:', e); }
-  if (typeof localforage !== 'undefined') {
-    try {
-      const snapshot = structuredClone(DB);
-      localforage.setItem('elevens_db', snapshot).catch(err => console.warn('localforage error:', err));
-    } catch(e) { console.warn('Save snapshot error:', e); }
+// ===== Penyimpanan poster terpisah (IndexedDB) =====
+// Poster (base64) dipisah dari DB utama supaya localStorage tidak cepat penuh
+// dan parsing JSON saat load awal jauh lebih ringan. DB di memori tetap berisi
+// base64 penuh (f.poster dsb tetap berfungsi seperti biasa di semua kode render),
+// hanya versi yang DITULIS ke localStorage/localforage utama yang "ringan"
+// (poster diganti jadi id referensi, base64 aslinya disimpan di store terpisah).
+const posterStore = (typeof localforage !== 'undefined')
+  ? localforage.createInstance({ name: 'elevens', storeName: 'posters' })
+  : null;
+const _posterMemCache = new Map(); // posterId -> base64, cache di memori biar load instan
+
+function _isBase64Img(v) { return typeof v === 'string' && v.indexOf('data:image') === 0; }
+// Id poster harus STABIL untuk string base64 yang sama (dipanggil ulang kapan saja harus
+// menghasilkan id yang sama), supaya pruneOrphanPosters bisa membandingkan dengan benar
+// dan poster yang sama tidak disimpan dobel-dobel di IndexedDB setiap kali save() dipanggil.
+// Pakai hash ringan (djb2) dari string base64 itu sendiri, bukan id random.
+function _posterHashId(str) {
+  let h = 5381;
+  for (let i = 0; i < str.length; i++) {
+    h = ((h << 5) + h + str.charCodeAt(i)) | 0;
   }
+  // Tambahkan panjang string supaya kemungkinan kolisi makin kecil
+  return 'p_' + (h >>> 0).toString(36) + '_' + str.length.toString(36);
+}
+
+// Jalan ke seluruh tree DB, cari semua field "poster" berisi base64.
+// mode 'dehydrate': ganti base64 -> {__posterRef:id}, kumpulkan id+base64 ke ctx.posters
+// mode 'hydrate': ganti {__posterRef:id} -> base64 (dari map yang diberikan)
+function _walkPosters(node, mode, ctx, seen) {
+  if (!node || typeof node !== 'object') return node;
+  if (seen.has(node)) return node;
+  seen.add(node);
+  if (Array.isArray(node)) {
+    for (let i = 0; i < node.length; i++) node[i] = _walkPosters(node[i], mode, ctx, seen);
+    return node;
+  }
+  for (const key in node) {
+    if (!Object.prototype.hasOwnProperty.call(node, key)) continue;
+    const val = node[key];
+    if (key === 'poster') {
+      if (mode === 'dehydrate' && _isBase64Img(val)) {
+        const pid = _posterHashId(val);
+        ctx.posters[pid] = val;
+        node[key] = { __posterRef: pid };
+      } else if (mode === 'hydrate' && val && typeof val === 'object' && val.__posterRef) {
+        const real = ctx.posters[val.__posterRef];
+        node[key] = (typeof real === 'string') ? real : '';
+      }
+      continue;
+    }
+    if (val && typeof val === 'object') node[key] = _walkPosters(val, mode, ctx, seen);
+  }
+  return node;
+}
+// Buat versi "ringan" dari DB (poster diganti referensi id) + kumpulan poster base64 lepasannya.
+function _dehydrateDB(dbObj) {
+  const clone = structuredClone(dbObj);
+  const ctx = { posters: {} };
+  _walkPosters(clone, 'dehydrate', ctx, new WeakSet());
+  return { light: clone, posters: ctx.posters };
+}
+// Isi balik referensi poster di DB ringan dengan base64 asli dari map yang diberikan.
+function _hydrateDB(dbObj, postersMap) {
+  _walkPosters(dbObj, 'hydrate', { posters: postersMap || {} }, new WeakSet());
+  return dbObj;
+}
+function save() {
+  try {
+    const { light, posters } = _dehydrateDB(DB);
+    try { localStorage.setItem('elevens_db', JSON.stringify(light)); } catch(e) { console.warn('localStorage penuh atau error:', e); }
+    if (posterStore) {
+      const ids = Object.keys(posters);
+      ids.forEach(pid => { _posterMemCache.set(pid, posters[pid]); });
+      if (ids.length) {
+        Promise.all(ids.map(pid => posterStore.setItem(pid, posters[pid]).catch(err => console.warn('poster store error:', err))));
+      }
+    }
+    if (typeof localforage !== 'undefined') {
+      localforage.setItem('elevens_db', light).catch(err => console.warn('localforage error:', err));
+    }
+  } catch(e) {
+    console.warn('Save error, fallback ke cara lama:', e);
+    try { localStorage.setItem('elevens_db', JSON.stringify(DB)); } catch(e2) {}
+  }
+}
+// Hapus poster di IndexedDB yang tidak lagi dirujuk DB manapun (films/progress/watchlist/history+payload),
+// dipanggil sesekali (mis. setelah hapus film) supaya store tidak menumpuk sampah.
+async function pruneOrphanPosters() {
+  if (!posterStore) return;
+  try {
+    const { posters: usedNow } = _dehydrateDB(DB);
+    const usedIds = new Set(Object.keys(usedNow));
+    const allKeys = await posterStore.keys();
+    const toRemove = allKeys.filter(k => !usedIds.has(k));
+    await Promise.all(toRemove.map(k => { _posterMemCache.delete(k); return posterStore.removeItem(k); }));
+  } catch(e) { console.warn('pruneOrphanPosters error:', e); }
 }
 ['detailComment', 'ulasanContentText', 'filmComment', 'filmUlasan'].forEach(id => {
     const el = document.getElementById(id);
@@ -5337,6 +5691,9 @@ var _pendingTmdbData = null;
 var _tmdbSearchTimer = null;
 var _tmdbResults = [];
 var _tmdbCallback = 'film';
+var _tmdbLastQuery = '';       // simpan query terakhir untuk back navigation
+var _tmdbLastResultsHTML = ''; // simpan hasil render terakhir untuk back navigation
+var _fromQuickForm = false;    // flag: full form dibuka dari quick form (TMDB)
 var _tmdbIsUlasanSecure = false;
 
 var TMDB_W300 = 'https://image.tmdb.org/t/p/w300';
@@ -5353,9 +5710,8 @@ var _TMDB_DEFAULT_KEY='7124280665a5429d2b307357173d4af3';
 function getTmdbKey(){try{return localStorage.getItem('elevens_tmdb_key')||_TMDB_DEFAULT_KEY;}catch(e){return _TMDB_DEFAULT_KEY;}}
 function setTmdbKey(k){try{localStorage.setItem('elevens_tmdb_key',k);}catch(e){}}
 function updateTmdbKeyDesc(){
-  var k=localStorage.getItem('elevens_tmdb_key')||'';
-  var el=document.getElementById('tmdbKeyDesc');
-  if(el) el.textContent=k?'Key kustom aktif — klik untuk ubah':'Key bawaan aktif';
+  // Desc dihapus dari UI Settings supaya tidak semak; fungsi dibiarkan no-op
+  // agar pemanggilan lama (saveTmdbKeyModal dkk) tidak error.
 }
 var _DEVELOPER_API_PIN = '1324';
 function openTmdbKeyModal(){
@@ -5465,6 +5821,9 @@ async function doTmdbSearch(){
         +'<i class="bi bi-chevron-right" style="color:var(--text3);font-size:.85rem;flex-shrink:0;"></i>'
         +'</div>';
     }).join('');
+    // Simpan untuk back navigation dari quick form
+    _tmdbLastQuery = q;
+    _tmdbLastResultsHTML = area.innerHTML;
   }catch(e){
     area.innerHTML='<div class="tmdb-empty"><i class="bi bi-wifi-off"></i><br>Tidak dapat terhubung ke TMDb.</div>';
   }
@@ -5586,12 +5945,15 @@ async function selectTmdbResult(idx){
   }
 }
 function _openTmdbQuickForm(){
-  _tmdbMode=true;
+  _tmdbMode=true; _fromQuickForm=false;
   editingFilmId=null;transferProgId=null;
   var d=_pendingTmdbData;
   document.getElementById('filmModalTitle').textContent='Tambah dari TMDb';
   document.getElementById('tmdbQuickSection').style.display='block';
   document.getElementById('filmFullFormSection').style.display='none';
+  // Tampilkan back button hanya jika ada hasil search yang tersimpan
+  var backBtn = document.getElementById('tmdbBackToSearchBtn');
+  if (backBtn) backBtn.style.display = _tmdbLastResultsHTML ? 'block' : 'none';
   var pe=document.getElementById('tmdbQPoster');
   if(pe)pe.innerHTML=d.poster?'<img src="'+d.poster+'" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">':'<i class="bi bi-film" style="font-size:1.5rem;"></i>';
   var te=document.getElementById('tmdbQTitle');
@@ -5621,6 +5983,38 @@ function _openTmdbQuickForm(){
   var ui=document.getElementById('tmdbQUlasan');if(ui)ui.value='';
   _tmdbIsUlasanSecure=false;applyTmdbSecureUlasanUI(false);
   openModal('filmModal');
+}
+
+// Kembali dari TMDB Quick Form → ke hasil pencarian sebelumnya
+function _backToTmdbSearch() {
+  // Reset quick form state
+  _pendingTmdbData = null; _tmdbMode = false; _fromQuickForm = false;
+  closeModal('filmModal');
+  // Buka lagi tmdbSearchModal dengan hasil sebelumnya
+  openModal('tmdbSearchModal');
+  var inp = document.getElementById('tmdbSearchInput');
+  if (inp && _tmdbLastQuery) {
+    inp.value = _tmdbLastQuery;
+    var clr = document.getElementById('tmdbClearBtn');
+    if (clr) clr.style.display = 'inline-block';
+  }
+  var area = document.getElementById('tmdbResultsArea');
+  if (area && _tmdbLastResultsHTML) area.innerHTML = _tmdbLastResultsHTML;
+}
+
+// Kembali dari Full Form → ke Quick Form (TMDB mode)
+function _backToQuickForm() {
+  if (!_pendingTmdbData) return;
+  _tmdbMode = true; _fromQuickForm = false;
+  document.getElementById('filmModalTitle').textContent = 'Tambah dari TMDb';
+  document.getElementById('tmdbQuickSection').style.display = 'block';
+  document.getElementById('filmFullFormSection').style.display = 'none';
+  var backBtn = document.getElementById('tmdbBackToSearchBtn');
+  if (backBtn) backBtn.style.display = _tmdbLastResultsHTML ? 'block' : 'none';
+  var fullBackBtn = document.getElementById('tmdbFullFormBackBtn');
+  if (fullBackBtn) fullBackBtn.style.display = 'none';
+  var heavy = document.getElementById('filmHeavyContent');
+  if (heavy) { heavy.style.visibility = 'hidden'; heavy.style.opacity = '0'; }
 }
 function saveTmdbFilm(){
   var d=_pendingTmdbData;
@@ -5664,9 +6058,12 @@ function saveTmdbFilm(){
 }
 function switchToFullForm(){
   if(!_pendingTmdbData)return;
-  var d=_pendingTmdbData;_tmdbMode=false;
+  var d=_pendingTmdbData;_tmdbMode=false;_fromQuickForm=true;
   document.getElementById('tmdbQuickSection').style.display='none';
   document.getElementById('filmFullFormSection').style.display='block';
+  // Tampilkan back button ke quick form
+  var fullBackBtn = document.getElementById('tmdbFullFormBackBtn');
+  if (fullBackBtn) fullBackBtn.style.display = 'block';
   var heavy=document.getElementById('filmHeavyContent');
   if(heavy){heavy.style.visibility='visible';heavy.style.opacity='1';}
   document.getElementById('filmModalTitle').textContent='Edit Detail Lengkap';
@@ -5772,13 +6169,187 @@ function _updateMonthlyChart() {
       + '</div>';
   }).join('');
   requestAnimationFrame(function() {
-    requestAnimationFrame(function() {
-      chartEl.querySelectorAll('.stats-month-bar').forEach(function(bar) {
-        bar.style.height = bar.dataset.target + '%';
-      });
+    document.querySelectorAll('.stats-month-bar').forEach(function(bar) {
+      bar.style.height = (bar.dataset.target || 0) + '%';
     });
   });
 }
+// ============================================================
+// ANDROID HARDWARE BACK BUTTON — DOM-driven, guard-per-layer
+// ============================================================
+(function() {
+  var _backExitReady = false;
+  var _backExitTimer = null;
+
+  // ── Haptic ─────────────────────────────────────────────────
+  function haptic(pattern) {
+    try { if (navigator.vibrate) navigator.vibrate(pattern); } catch(e) {}
+  }
+
+  // ── Hitung layer yang perlu di-guard:
+  //    1 (base guard) + jumlah modal yang sedang show
+  function _countLayers() {
+    var modals = document.querySelectorAll('.modal-overlay.show').length;
+    return 1 + modals;
+  }
+
+  // ── Sinkronkan history agar depth == _countLayers() ────────
+  // Dipanggil setiap kali modal dibuka/ditutup lewat tombol UI
+  function _syncHistory() {
+    var target = _countLayers();
+    // Selalu replace + push fresh supaya depth pasti sesuai
+    // Gunakan replaceState untuk slot saat ini, lalu push sisanya
+    try {
+      history.replaceState({ elevens: true, d: 0 }, '');
+      for (var i = 1; i <= target; i++) {
+        history.pushState({ elevens: true, d: i }, '');
+      }
+    } catch(e) {}
+  }
+
+  // ── Seed awal ──────────────────────────────────────────────
+  try {
+    history.replaceState({ elevens: true, d: 0 }, '');
+    history.pushState({ elevens: true, d: 1 }, '');
+  } catch(e) {}
+
+  // ── Patch openModal ────────────────────────────────────────
+  var _origOpen = window.openModal;
+  window.openModal = function(id) {
+    _origOpen(id);
+    // Tunggu animasi selesai baru sinkron (rAF cukup)
+    requestAnimationFrame(function() {
+      _syncHistory();
+      _backExitReady = false;
+      clearTimeout(_backExitTimer);
+    });
+  };
+
+  // ── Patch closeModal (tutup lewat tombol X / swipe) ────────
+  var _origClose = window.closeModal;
+  window.closeModal = function(id, e) {
+    _origClose(id, e);
+    // Sinkron setelah animasi tutup (~100ms)
+    setTimeout(function() { _syncHistory(); }, 120);
+  };
+
+  // ── popstate ───────────────────────────────────────────────
+  window.addEventListener('popstate', function() {
+    var handled = false;
+
+    // P1: confirm dialog
+    var confirmEl = document.querySelector('.confirm-overlay.show');
+    if (confirmEl) {
+      confirmEl.classList.remove('show');
+      setTimeout(function() {
+        if (!document.querySelectorAll('.modal-overlay.show').length)
+          document.body.classList.remove('modal-open');
+      }, 50);
+      handled = true;
+    }
+
+    // P2: custom select popup
+    if (!handled) {
+      var openPop = document.querySelector('.custom-sel-popup.open');
+      if (openPop) {
+        if (typeof closeAllPops === 'function') closeAllPops(null);
+        handled = true;
+      }
+    }
+
+    // P3: tutup modal yang paling atas (DOM order = urutan dibuka)
+    if (!handled) {
+      var allOpen = document.querySelectorAll('.modal-overlay.show');
+      if (allOpen.length > 0) {
+        var topModal = allOpen[allOpen.length - 1];
+        // Panggil _origClose langsung agar tidak re-trigger _syncHistory
+        // (history akan disinkron di bawah via re-push guard)
+        _origClose(topModal.id);
+        handled = true;
+      }
+    }
+
+    // P4: kembali ke halaman sebelumnya, atau Home jika tidak ada
+    if (!handled && typeof currentPage !== 'undefined' && currentPage !== 'home') {
+      if (typeof navTo === 'function') {
+        // Gunakan _prevPage jika valid dan berbeda dari currentPage
+        var dest = (typeof _prevPage !== 'undefined' && _prevPage && _prevPage !== currentPage)
+          ? _prevPage : 'home';
+        // Reset _prevPage supaya tidak circular (back lagi = ke home)
+        _prevPage = null;
+        navTo(dest);
+      }
+      handled = true;
+    }
+
+    if (handled) {
+      // Re-push 1 guard agar popstate berikutnya bisa diintersep
+      // Jumlah modal sudah berkurang 1, tapi animasi belum selesai —
+      // push dulu 1 entry, _syncHistory akan memperbaiki setelah 120ms
+      try { history.pushState({ elevens: true, d: 1 }, ''); } catch(e) {}
+      setTimeout(function() { _syncHistory(); }, 130);
+      _backExitReady = false;
+      clearTimeout(_backExitTimer);
+    } else {
+      // Tidak ada yang ditangani → user di Home tanpa modal
+      if (_backExitReady) {
+        // Tekan kedua → biarkan browser keluar (tidak re-push)
+        _backExitReady = false;
+        return;
+      }
+      // Tekan pertama → getar + toast, lalu re-push guard
+      haptic([40, 60, 40]);
+      if (typeof toast === 'function') toast('Tekan kembali sekali lagi untuk keluar');
+      _backExitReady = true;
+      clearTimeout(_backExitTimer);
+      _backExitTimer = setTimeout(function() { _backExitReady = false; }, 2500);
+      try { history.pushState({ elevens: true, d: 1 }, ''); } catch(e) {}
+    }
+  });
+})();
+</script>
+
+<!-- Custom Scrollbar -->
+<div id="customScrollbar"></div>
+<script>
+(function() {
+  var bar = document.getElementById('customScrollbar');
+  var hideTimer = null;
+
+  var NAV_H = 70;  // --nav-h
+  var BAR_H = 72;  // --bar-h
+  var PADDING = 6; // jarak dari tepi nav/bar
+
+  function updateBar() {
+    var scrollTop = window.scrollY || document.documentElement.scrollTop;
+    var docH = document.documentElement.scrollHeight;
+    var winH = window.innerHeight;
+    var scrollable = docH - winH;
+    if (scrollable <= 0) { bar.style.opacity = '0'; return; }
+
+    // Area yang boleh dipakai scrollbar (antara nav bawah dan bar atas)
+    var trackTop = NAV_H + PADDING;
+    var trackBottom = winH - BAR_H - PADDING;
+    var trackH = trackBottom - trackTop;
+
+    var ratio = scrollTop / scrollable;
+    var barH = Math.max(36, (winH / docH) * trackH);
+    if (barH > trackH) barH = trackH;
+    var maxTop = trackH - barH;
+    var topPx = trackTop + ratio * maxTop;
+
+    bar.style.height = barH + 'px';
+    bar.style.transform = 'translateY(' + topPx + 'px)';
+    bar.style.opacity = '1';
+
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(function() {
+      bar.style.opacity = '0';
+    }, 1200);
+  }
+
+  window.addEventListener('scroll', updateBar, { passive: true });
+})();
 </script>
 </body>
-        </html>
+  </html>
